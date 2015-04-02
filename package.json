@@ -1,0 +1,25 @@
+{
+  "name": "mhd2xds",
+  "version": "0.1.0",
+  "description": "An OpenHIM mediator that converts MHD messages to XDS.b messages.",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "license": "MPL2",
+  "dependencies": {
+    "express": "^4.10.0",
+    "needle": "^0.7.10",
+    "source-map-support": "^0.2.10"
+  },
+  "devDependencies": {
+    "coffeelint": "^1.9.3",
+    "grunt": "^0.4.5",
+    "grunt-coffeelint": "0.0.13",
+    "grunt-contrib-clean": "^0.6.0",
+    "grunt-contrib-coffee": "^0.13.0",
+    "grunt-contrib-copy": "~0.4.1",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-express": "^1.4.1",
+    "grunt-mocha-cli": "^1.13.0"
+  }
+}

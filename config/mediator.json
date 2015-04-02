@@ -1,0 +1,40 @@
+{
+  "urn": "urn:uuid:8e17b950-d909-11e4-9d67-4b7f2dd5beb9",
+  "version": "0.1.0",
+  "name": "mhd2xds",
+  "description": "An OpenHIM mediator that converts MHD messages to XDS.b messages.",
+  "defaultChannelConfig": [
+    {
+      "name": "mhd2xds",
+      "urlPattern": "/sample-pattern",
+      "alerts": [],
+      "txRerunAcl": [],
+      "txViewFullAcl": [],
+      "txViewAcl": [],
+      "properties": [],
+      "matchContentTypes": [],
+      "routes": [
+        {
+          "name": "mhd2xds Route",
+          "host": "localhost",
+          "path": "",
+          "port": "3100",
+          "primary": true,
+          "type": "http"
+        }
+      ],
+      "allow": ["admin"],
+      "type": "http"
+    }
+  ],
+  "endpoints": [
+    {
+      "name": "mhd2xds Route",
+      "host": "localhost",
+      "path": "",
+      "port": "3100",
+      "primary": true,
+      "type": "http"
+    }
+  ]
+}
