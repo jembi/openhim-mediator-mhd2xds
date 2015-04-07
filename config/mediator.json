@@ -6,7 +6,7 @@
   "defaultChannelConfig": [
     {
       "name": "mhd2xds",
-      "urlPattern": "/sample-pattern",
+      "urlPattern": "/mhd/.*",
       "alerts": [],
       "txRerunAcl": [],
       "txViewFullAcl": [],
@@ -23,7 +23,7 @@
           "type": "http"
         }
       ],
-      "allow": ["admin"],
+      "allow": ["mhd"],
       "type": "http"
     }
   ],
