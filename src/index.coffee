@@ -8,6 +8,7 @@ app = express()
 request = require 'request'
 formidable = require 'formidable'
 Busboy = require 'busboy'
+mhd2xds = require './mhd2xds'
 
 # get config objects
 config = require "../config/config"
@@ -74,7 +75,7 @@ app.post '/', (req, res) ->
         'content-type': 'application/xop+xml; charset=UTF-8; type="application/soap+xml"'
         'content-transfer-encoding': 'binary'
         'content-id': '<metadata@ihe.net>'
-        body: metadata.toString()
+        body: mhd2xds.mhd1Metadata2Xds metadata
       ,
         'content-type': 'text/xml'
         'content-transfer-encoding': 'binary'
