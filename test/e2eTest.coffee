@@ -3,6 +3,22 @@ http = require 'http'
 request = require 'supertest'
 config = require '../config/config'
 
+xdsResponse =
+  """
+  <?xml version='1.0' encoding='UTF-8'?>
+  <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope"
+      xmlns:wsa="http://www.w3.org/2005/08/addressing">
+      <soapenv:Header>
+          <wsa:Action soapenv:mustUnderstand="true">urn:ihe:iti:2007:RegisterDocumentSet-bResponse</wsa:Action>
+          <wsa:RelatesTo>urn:uuid:D9D54C50296A3C11D11220872153270</wsa:RelatesTo>
+      </soapenv:Header>
+      <soapenv:Body>
+          <rs:RegistryResponse xmlns:rs="urn:oasis:names:tc:ebxml-regrep:xsd:rs:3.0"
+              status="urn:oasis:names:tc:ebxml-regrep:ResponseStatusType:Success"/>
+      </soapenv:Body>
+  </soapenv:Envelope>
+  """
+
 describe 'e2e integration tests', ->
 
   before (done) ->
@@ -26,7 +42,10 @@ describe 'e2e integration tests', ->
       req.on 'end', () ->
         # TODO: test body for correct MIME/XOP correctness
         console.log "The e2e server recieved:\n#{body}"
-        done()
+
+        console.log '\nmock server writing response...'
+        res.writeHead 200, 'content-type': 'application/soap+xml'
+        res.end xdsResponse
 
     server.listen 6644, ->
       console.log 'server listening'
@@ -35,7 +54,9 @@ describe 'e2e integration tests', ->
         .post('/')
         .set('content-type', 'multipart/form-data; boundary=48940923NODERESLTER3890457293')
         .send(mhd)
-        .expect(200)
-        .end (err, res, body) ->
+        .expect(201)
+        .end (err, res) ->
           console.log err if err?
-          console.log "The mediator returned:\n#{body}"
+
+          console.log "The mediator returned:\n#{JSON.stringify(JSON.parse(res.text), null, 4)}"
+          done()

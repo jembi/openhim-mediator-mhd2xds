@@ -1,4 +1,4 @@
-#require('source-map-support').install()
+require('source-map-support').install()
 
 # load express
 express = require 'express'
@@ -20,11 +20,6 @@ register = require "./register"
 if config.registration.enabled
   console.log config.registration.enabled
   register.registerMediator apiConfig, mediatorConfig
-
-
-#########################
-##### Server Setup  #####
-#########################
 
 ##### Default Endpoint  #####
 app.post '/', (req, res) ->
@@ -51,7 +46,9 @@ app.post '/', (req, res) ->
 
   busboy.on 'finish', ->
     console.log 'Finished parsing attachments'
-    
+
+    xdsMeta = mhd2xds.mhd1Metadata2Xds metadata
+
     request.post
       uri: 'http://localhost:6644/'
       method: 'POST'
@@ -59,57 +56,40 @@ app.post '/', (req, res) ->
         'content-type': 'application/xop+xml; charset=UTF-8; type="application/soap+xml"'
         'content-transfer-encoding': 'binary'
         'content-id': '<metadata@ihe.net>'
-        body: mhd2xds.mhd1Metadata2Xds metadata
+        body: xdsMeta
       ,
         'content-type': 'text/xml'
         'content-transfer-encoding': 'binary'
         'content-id': "<#{metadata.documentEntry.entryUUID.replace('urn:uuid:', '')}@ihe.net>"
         body: (Buffer.concat contentBufs).toString('base64')
       ]
-    , (err, res, body) ->
+    , (err, xdsRes, body) ->
 
-      # convert response back to mhdv1
-
-      #########################################
-      ##### Create Initial Orchestration  #####
-      #########################################
-       
-      # context object to store json objects
-      ctxObject = {}
-      ctxObject['primary'] = response
-       
-      # Capture 'primary' orchestration data
+      # Capture orchestration data
       orchestrationsResults = []
       orchestrationsResults.push
-        name:             'Primary Route'
+        name:             'XDS.b request'
         request:
-          path:           req.path
-          headers:        req.headers
-          querystring:    req.originalUrl.replace req.path, ""
-          body:           req.body
-          method:         req.method
+          path:           '/'
+          headers:        ''
+          querystring:    ''
+          body:           xdsMeta + '\n===Binary Base64 document data excluded==='
+          method:         'POST'
           timestamp:      new Date().getTime()
         response:
-          status:         200
-          body:           body
+          status:         xdsRes.statusCode
+          body:           ''
           timestamp:      new Date().getTime()
 
-      ######################################
-      ##### Construct Response Object  #####
-      ######################################
-       
+      # set response
       urn = mediatorConfig.urn
-      status = 'Successful'
+      status = if /urn:oasis:names:tc:ebxml-regrep:ResponseStatusType:Success/i.test(body) then 'Successful' else 'Failed'
       response =
-        status: 200
+        status: if status is 'Successful' then 201 else 400
         headers:
           'content-type': 'application/json'
-        body: response
+        body: body
         timestamp: new Date().getTime()
-       
-      # construct property data to be returned
-      properties = {}
-      properties['property'] = 'Primary Route'
        
       # construct returnObject to be returned
       returnObject =
@@ -117,18 +97,15 @@ app.post '/', (req, res) ->
         "status":         status
         "response":       response
         "orchestrations": orchestrationsResults
-        "properties":     properties
 
       # set content type header so that OpenHIM knows how to handle the response
-      res.set 'Content-Type', 'application/json+openhim'
-      res.send returnObject
+      console.log 'responding...'
+      res.writeHead response.status, 'Content-Type': 'application/json+openhim'
+      res.end JSON.stringify returnObject
+      console.log 'responded.'
 
   # pipe request of to busboy for parsing
   req.pipe busboy
   
 # export app for use in grunt-express module
 module.exports = app
-
-#########################
-##### Server Setup  #####
-#########################
