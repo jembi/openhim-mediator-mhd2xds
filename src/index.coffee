@@ -31,21 +31,6 @@ app.post '/', (req, res) ->
 
   console.log 'request recieved'
 
-  #body = ''
-  #req.on 'data', (chunk) ->
-  #  body += chunk
-
-  #req.on 'end', ->
-
-  # do mhdv1 to xds.b conversion ...
-  #form = new formidable.IncomingForm()
-
-  #form.parse req, (err, fields, files) ->
-  #  console.error err if err?
-    
-  #  if not files['ihe-mhd-metadata']? and not files['content']?
-  #    throw new Error 'No ihe-mhd-metadata or content attachments found.'
-
   busboy = new Busboy headers: req.headers
 
   contentBufs = []
@@ -66,8 +51,7 @@ app.post '/', (req, res) ->
 
   busboy.on 'finish', ->
     console.log 'Finished parsing attachments'
-    console.log metadata
-    #console.log content
+    
     request.post
       uri: 'http://localhost:6644/'
       method: 'POST'
@@ -79,7 +63,7 @@ app.post '/', (req, res) ->
       ,
         'content-type': 'text/xml'
         'content-transfer-encoding': 'binary'
-        'content-id': '<document@ihe.net>'
+        'content-id': "<#{metadata.documentEntry.entryUUID.replace('urn:uuid:', '')}@ihe.net>"
         body: (Buffer.concat contentBufs).toString('base64')
       ]
     , (err, res, body) ->
