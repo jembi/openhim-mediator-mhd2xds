@@ -24,8 +24,8 @@ describe 'e2e integration tests', ->
         body += chunk
 
       req.on 'end', () ->
-        # test body for correct XDS.b-ness
-        console.log body
+        # TODO: test body for correct MIME/XOP correctness
+        console.log "The e2e server recieved:\n#{body}"
         done()
 
     server.listen 6644, ->
@@ -36,5 +36,6 @@ describe 'e2e integration tests', ->
         .set('content-type', 'multipart/form-data; boundary=48940923NODERESLTER3890457293')
         .send(mhd)
         .expect(200)
-        .end (err, res) ->
+        .end (err, res, body) ->
           console.log err if err?
+          console.log "The mediator returned:\n#{body}"
