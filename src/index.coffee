@@ -6,7 +6,6 @@ app = express()
 
 # require modules
 request = require 'request'
-formidable = require 'formidable'
 Busboy = require 'busboy'
 mhd2xds = require './mhd2xds'
 
@@ -33,7 +32,6 @@ app.post '/', (req, res) ->
   metadata = null
 
   busboy.on 'file', (fieldname, file, filename, encoding, mimetype) ->
-    console.log 'File [' + fieldname + ']: filename: ' + filename + ', encoding: ' + encoding + ', mimetype: ' + mimetype
     if fieldname is 'ihe-mhd-metadata'
       file.on 'data', (chunk) ->
         metadataBufs.push chunk
