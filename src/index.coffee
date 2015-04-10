@@ -64,8 +64,7 @@ app.post '/', (req, res) ->
     , (err, xdsRes, body) ->
 
       # Capture orchestration data
-      orchestrationsResults = []
-      orchestrationsResults.push
+      orchestration =
         name:             'XDS.b request'
         request:
           path:           '/'
@@ -76,31 +75,39 @@ app.post '/', (req, res) ->
           timestamp:      new Date().getTime()
         response:
           status:         xdsRes.statusCode
-          body:           ''
+          body:           body
           timestamp:      new Date().getTime()
 
-      # set response
-      urn = mediatorConfig.urn
-      status = if /urn:oasis:names:tc:ebxml-regrep:ResponseStatusType:Success/i.test(body) then 'Successful' else 'Failed'
-      response =
-        status: if status is 'Successful' then 201 else 400
-        headers:
-          'content-type': 'application/json'
-        body: body
-        timestamp: new Date().getTime()
-       
-      # construct returnObject to be returned
-      returnObject =
-        "x-mediator-urn": urn
-        "status":         status
-        "response":       response
-        "orchestrations": orchestrationsResults
+      if xdsRes.headers['content-type'] is 'application/json+openhim'
+        console.log 'Recieved mediator response'
+        # alter existing response object
+        returnObject = JSON.parse body
+        returnObject['x-mediator-urn'] = mediatorConfig.urn
+        returnObject.orchestrations.push orchestration
+        returnObject.response.status = if returnObject.status is 'Successful' then 201 else returnObject.response.status
+      else
+        console.log 'Recieved non-mediator response'
+        # set response
+        status = if /urn:oasis:names:tc:ebxml-regrep:ResponseStatusType:Success/i.test(body) then 'Successful' else 'Failed'
+        response =
+          status: if status is 'Successful' then 201 else 400
+          headers:
+            'content-type': 'application/json'
+          body: body
+          timestamp: new Date().getTime()
+
+        # construct returnObject to be returned
+        returnObject =
+          "x-mediator-urn": mediatorConfig.urn
+          "status":         status
+          "response":       response
+          "orchestrations": [orchestration]
 
       # set content type header so that OpenHIM knows how to handle the response
-      console.log 'responding...'
-      res.writeHead response.status, 'Content-Type': 'application/json+openhim'
+      console.log 'responding...' + returnObject.status
+      res.writeHead returnObject.response.status, 'Content-Type': 'application/json+openhim'
       res.end JSON.stringify returnObject
-      console.log 'responded.'
+      console.log 'responded with: ' + JSON.stringify returnObject
 
   # pipe request of to busboy for parsing
   req.pipe busboy
