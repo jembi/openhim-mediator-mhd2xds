@@ -305,8 +305,8 @@ exports.ProvideAndRegisterDocumentSetRequest = class ProvideAndRegisterDocumentS
       'xmlns:rs': 'urn:oasis:names:tc:ebxml-regrep:xsd:rs:3.0'
     @['lcm:SubmitObjectsRequest'] =
       'RegistryObjectList':
-        'DocumentEntry': []
-        'SubmissionSet': submissionSet
+        'ExtrinsicObject': []
+        'RegistryPackage': submissionSet
         # Classisify registry package as a submission set
         'Classification': new Classification(
           null,
@@ -319,7 +319,7 @@ exports.ProvideAndRegisterDocumentSetRequest = class ProvideAndRegisterDocumentS
         'Document': []
 
     for documentEntry in documentEntries
-      @['lcm:SubmitObjectsRequest'].RegistryObjectList.DocumentEntry.push documentEntry
+      @['lcm:SubmitObjectsRequest'].RegistryObjectList.ExtrinsicObject.push documentEntry
       @['lcm:SubmitObjectsRequest'].RegistryObjectList.Association.push new Association(
         'urn:oasis:names:tc:ebxml-regrep:AssociationType:HasMember',
         submissionSet['@'].id,
