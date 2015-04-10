@@ -241,20 +241,20 @@ exports.SubmissionSet = class SubmissionSet
       @ExternalIdentifier.push new ExternalIdentifier(
         'XDSSubmissionSet.patientId',
         'urn:uuid:6b5aea1a-874d-4603-a4bc-96a0a7b38446',
-        null,
-        null)
+        entryUUID,
+        patientId)
     if sourceId
       @ExternalIdentifier.push new ExternalIdentifier(
         'XDSSubmissionSet.sourceId',
         'urn:uuid:554ac39e-e3fe-47fe-b233-965d2a147832',
-        null,
-        null)
+        entryUUID,
+        sourceId)
     if uniqueId
       @ExternalIdentifier.push new ExternalIdentifier(
         'XDSSubmissionSet.uniqueId',
         'urn:uuid:96fdda7c-d067-4183-912e-bf5ee74998a8',
-        null,
-        null)
+        entryUUID,
+        uniqueId)
 
 exports.Association = class Association
   constructor: (type, srcObj, targetObj, slot) ->
