@@ -1,7 +1,4 @@
-##################################
-##### Mediator Registration  #####
-##################################
-
+# Mediator Registration
 needle = require 'needle'
 crypto = require 'crypto'
 
@@ -62,7 +59,3 @@ exports.registerMediator = (apiConfig, mediatorConfig) ->
         console.log 'Mediator has been successfully created/updated.'
       else
         console.log "An error occured while trying to create/update the mediator: #{resp.body}"
-
-##################################
-##### Mediator Registration  #####
-##################################
