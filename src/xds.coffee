@@ -2,6 +2,8 @@ uuid = require 'node-uuid'
 
 exports.Name = class Name
   constructor: (name, charset, lang) ->
+    @['@'] =
+      'xmlns': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
     @LocalizedString =
       '@':
         'charset': charset
@@ -11,6 +13,7 @@ exports.Name = class Name
 exports.Slot = class Slot
   constructor: (name, vals...) ->
     @['@'] =
+      'xmlns': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
       'name': name
     @ValueList = []
 
@@ -23,6 +26,7 @@ exports.Slot = class Slot
 exports.Classification = class Classification
   constructor: (name, scheme, obj, nodeRep, classNode, slots...) ->
     @['@'] =
+      'xmlns': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
       'id': 'urn:uuid:' + uuid.v4()
       'classificationScheme': scheme
       'classifiedObject': obj
@@ -41,6 +45,7 @@ exports.Classification = class Classification
 exports.ExternalIdentifier = class ExternalIdentifier
   constructor: (name, scheme, regObj, value) ->
     @['@'] =
+      'xmlns': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
       'id': 'urn:uuid:' + uuid.v4()
       'identificationScheme': scheme
       'registryObject': regObj
@@ -73,6 +78,7 @@ exports.ExternalIdentifier = class ExternalIdentifier
 exports.DocumentEntry = class DocumentEntry
   constructor: (entryUUID, mimeType, availabilityStatus, hash, size, languageCode, repositoryUniqueId, sourcePatientId, patientId, uniqueId, creationTime, clazz, confidentiality, event, format, healthcareFacilityType, practiceSetting, type, authorSlots) ->
     @['@'] =
+      'xmlns': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
       'id': entryUUID
       'mimeType': mimeType
       'objectType': 'urn:uuid:7edca82f-054d-47f2-a032-9b2a5b5186c1'
@@ -203,6 +209,7 @@ exports.DocumentEntry = class DocumentEntry
 exports.SubmissionSet = class SubmissionSet
   constructor: (entryUUID, avalabilityStatus, submissionTime, patientId, sourceId, uniqueId, contentType, authorSlots) ->
     @['@'] =
+      'xmlns': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
       'id': entryUUID
       'status': avalabilityStatus
 
@@ -259,6 +266,7 @@ exports.SubmissionSet = class SubmissionSet
 exports.Association = class Association
   constructor: (type, srcObj, targetObj, slot) ->
     @['@'] =
+      'xmlns': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
       'associationType': type
       'id': 'urn:uuid:c9abae3c-688f-4505-a136-bd99ca5019fb'
       'sourceObject': srcObj
@@ -268,6 +276,7 @@ exports.Association = class Association
 exports.Document = class Document
   constructor: (id, href) ->
     @['@'] =
+      'xmlns': 'urn:ihe:iti:xds-b:2007'
       'id': id
     @['xop:Include'] =
       '@':
