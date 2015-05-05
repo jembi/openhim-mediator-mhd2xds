@@ -9,7 +9,7 @@ describe 'XDS class Tests', ->
   describe 'Name class', ->
 
     it 'should contain name, charset and lang', ->
-      name = new xds.Name('name', 'UTF-8', 'en-GB')
+      name = new xds.Name 'name', 'UTF-8', 'en-GB'
       xml = js2xml 'Name', name
       doc = new dom().parseFromString xml
       select = xpath.useNamespaces
@@ -26,7 +26,7 @@ describe 'XDS class Tests', ->
   describe 'Slot class', ->
 
     it 'should contain name', ->
-      slot = new xds.Slot('name', 'val')
+      slot = new xds.Slot 'name', 'val'
       xml = js2xml 'Slot', slot
       doc = new dom().parseFromString xml
       select = xpath.useNamespaces
@@ -37,7 +37,7 @@ describe 'XDS class Tests', ->
       name.should.be.exactly 'name'
 
     it 'should contain single value', ->
-      slot = new xds.Slot('name', 'val1')
+      slot = new xds.Slot 'name', 'val1'
       xml = js2xml 'Slot', slot
       doc = new dom().parseFromString xml
       select = xpath.useNamespaces
@@ -49,8 +49,8 @@ describe 'XDS class Tests', ->
       count.should.be.exactly 1
       val.should.be.exactly 'val1'
 
-    it 'should conmtain multiple values', ->
-      slot = new xds.Slot('name', 'val1', 'val2', 'val3')
+    it 'should contain multiple values', ->
+      slot = new xds.Slot 'name', 'val1', 'val2', 'val3'
       xml = js2xml 'Slot', slot
       doc = new dom().parseFromString xml
       select = xpath.useNamespaces
@@ -65,3 +65,38 @@ describe 'XDS class Tests', ->
       val1.should.be.exactly 'val1'
       val2.should.be.exactly 'val2'
       val3.should.be.exactly 'val3'
+
+  describe 'Classification class', ->
+
+    it 'should set name, scheme, obj, nodeRep and classNode', ->
+      clazz = new xds.Classification 'name', 'scheme', 'obj', 'nodeRep', 'classNode'
+      xml = js2xml 'Classification', clazz
+      doc = new dom().parseFromString xml
+      select = xpath.useNamespaces
+        'rim': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
+
+      name = select 'string(//rim:Classification/rim:Name/rim:LocalizedString/@value)', doc
+      scheme = select 'string(//rim:Classification/@classificationScheme)', doc
+      obj = select 'string(//rim:Classification/@classifiedObject)', doc
+      nodeRep = select 'string(//rim:Classification/@nodeRepresentation)', doc
+      classNode = select 'string(//rim:Classification/@classificationNode)', doc
+
+      name.should.be.exactly 'name'
+      scheme.should.be.exactly 'scheme'
+      obj.should.be.exactly 'obj'
+      nodeRep.should.be.exactly 'nodeRep'
+      classNode.should.be.exactly 'classNode'
+
+    it 'should set multiple slots', ->
+      slot1 = new xds.Slot 'name1', 'val1', 'val2', 'val3'
+      slot2 = new xds.Slot 'name2', 'val1', 'val2'
+      clazz = new xds.Classification 'name', 'scheme', 'obj', 'nodeRep', 'classNode', slot1, slot2
+      xml = js2xml 'Classification', clazz
+      console.log xml
+      doc = new dom().parseFromString xml
+      select = xpath.useNamespaces
+        'rim': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
+
+      count = select 'count(//rim:Classification/rim:Slot)', doc
+
+      count.should.be.exactly 2
