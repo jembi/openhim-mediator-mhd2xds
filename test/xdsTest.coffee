@@ -12,6 +12,16 @@ describe 'XDS class Tests', ->
   constructTestSubSet = ->
     return new xds.SubmissionSet 'entryUUID', 'availabilityStatus', 'submissionTime', 'patientId', 'sourceId', 'uniqueId', { code: 'contentTypeCode', name: 'contentTypeName', scheme: 'contentTypeScheme' }, [ new xds.Slot 'authorSlot', 'authorVal' ]
 
+  constructTestPNR = ->
+    return new xds.ProvideAndRegisterDocumentSetRequest(
+      [
+        constructTestDocEntry()
+      ,
+        constructTestDocEntry()
+      ]
+      ,
+      constructTestSubSet())
+
   checkGeneralClassification = (doc, clazzScheme, name, code, scheme) ->
     select = xpath.useNamespaces
       'rim': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
@@ -343,14 +353,7 @@ describe 'XDS class Tests', ->
       exists.should.be.exactly true
 
     it 'should set the document entries', ->
-      pnr = new xds.ProvideAndRegisterDocumentSetRequest(
-        [
-          constructTestDocEntry()
-        ,
-          constructTestDocEntry()
-        ]
-        ,
-        constructTestSubSet())
+      pnr = constructTestPNR()
       xml = js2xml 'ProvideAndRegisterDocumentSetRequest', pnr
       doc = new dom().parseFromString xml
       select = xpath.useNamespaces
@@ -360,3 +363,42 @@ describe 'XDS class Tests', ->
 
       exists = select 'count(//xds:ProvideAndRegisterDocumentSetRequest/lcm:SubmitObjectsRequest/rim:RegistryObjectList/rim:ExtrinsicObject)', doc
       exists.should.be.exactly 2
+
+    # TODO: association and document element
+
+  describe 'SoapHeader class', ->
+
+    it 'should set required soap header attributes', ->
+      header = new xds.SoapHeader 'MessageID', 'to'
+      xml = js2xml 'Header', header
+      doc = new dom().parseFromString xml
+      select = xpath.useNamespaces
+        'soap': 'http://www.w3.org/2003/05/soap-envelope'
+        'a': 'http://www.w3.org/2005/08/addressing'
+
+      action = select 'string(//soap:Header/a:Action[@mustUnderstand="true"])', doc
+      to = select 'string(//soap:Header/a:To[@mustUnderstand="true"])', doc
+      messageID = select 'string(//soap:Header/a:MessageID)', doc
+      replyTo = select 'string(//soap:Header/a:ReplyTo[@mustUnderstand="true"]/a:Address)', doc
+
+      action.should.be.exactly 'urn:ihe:iti:2007:ProvideAndRegisterDocumentSet-b'
+      to.should.be.exactly 'to'
+      messageID.should.be.exactly 'MessageID'
+      replyTo.should.be.exactly 'http://www.w3.org/2005/08/addressing/anonymous'
+
+  describe 'SaopEnvelope class', ->
+
+    it 'should set the require soap envelope attributes', ->
+      env = new xds.SoapEnvelope constructTestPNR()
+      xml = js2xml 'Envelope', env
+      console.log xml
+      doc = new dom().parseFromString xml
+      select = xpath.useNamespaces
+        'soap': 'http://www.w3.org/2003/05/soap-envelope'
+        'xds': 'urn:ihe:iti:xds-b:2007'
+
+      headerExists = select 'boolean(//soap:Envelope/soap:Header)', doc
+      pnrExists = select 'boolean(//soap:Envelope/soap:Body/xds:ProvideAndRegisterDocumentSetRequest)', doc
+
+      headerExists.should.be.exactly true
+      pnrExists.should.be.exactly true

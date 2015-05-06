@@ -285,21 +285,22 @@ exports.Document = class Document
         'href': href
 
 exports.SoapHeader = class SoapHeader
-  constructor: (MessageID) ->
+  constructor: (MessageID, to) ->
     @['@'] =
+      'xmlns': 'http://www.w3.org/2003/05/soap-envelope'
       'xmlns:a': 'http://www.w3.org/2005/08/addressing'
     @['a:Action'] =
       '@':
-        'soap:mustUnderstand': 'true'
+        'mustUnderstand': 'true'
       '#': 'urn:ihe:iti:2007:ProvideAndRegisterDocumentSet-b'
     @['a:To'] =
       '@':
-        'soap:mustUnderstand': 'true'
-      '#': 'https://localhost:5000/xdsrepository'
+        'mustUnderstand': 'true'
+      '#': to
     @['a:MessageID'] = MessageID
     @['a:ReplyTo'] =
       '@':
-        'soap:mustUnderstand': 'true'
+        'mustUnderstand': 'true'
       'a:Address': 'http://www.w3.org/2005/08/addressing/anonymous'
 
 ###
@@ -343,7 +344,7 @@ exports.ProvideAndRegisterDocumentSetRequest = class ProvideAndRegisterDocumentS
 exports.SoapEnvelope = class SoapEnvelope
   constructor: (ProvideAndRegisterDocumentSetRequest) ->
     @['@'] =
-      'xmlns:soap': 'http://www.w3.org/2003/05/soap-envelope'
-    @['soap:Header'] = new SoapHeader(uuid.v4())
-    @['soap:Body'] =
-      'xds:ProvideAndRegisterDocumentSetRequest': ProvideAndRegisterDocumentSetRequest
+      'xmlns': 'http://www.w3.org/2003/05/soap-envelope'
+    @['Header'] = new SoapHeader(uuid.v4())
+    @['Body'] =
+      'ProvideAndRegisterDocumentSetRequest': ProvideAndRegisterDocumentSetRequest
