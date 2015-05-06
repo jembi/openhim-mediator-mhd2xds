@@ -6,6 +6,12 @@ should = require 'should'
 
 describe 'XDS class Tests', ->
 
+  constructTestDocEntry = ->
+    return new xds.DocumentEntry 'entryUUID', 'mimeType', 'availabilityStatus', 'hash', 'size', 'languageCode', 'repositoryUniqueId', 'sourcePatientId', 'patientId', 'uniqueId', 'creationTime', { code: 'clazzCode', name: 'clazzName', scheme: 'clazzScheme' }, { code: 'confidentialityCode', name: 'confidentialityName', scheme: 'confidentialityScheme' }, { code: 'eventCode', name: 'eventName', scheme: 'eventScheme' }, { code: 'formatCode', name: 'formatName', scheme: 'formatScheme' }, { code: 'healthcareFacilityTypeCode', name: 'healthcareFacilityTypeName', scheme: 'healthcareFacilityTypeScheme' }, { code: 'practiceSettingCode', name: 'practiceSettingName', scheme: 'practiceSettingScheme' }, { code: 'typeCode', name: 'typeName', scheme: 'typeScheme' }, [ new xds.Slot 'authorSlot', 'authorVal' ]
+
+  constructTestSubSet = ->
+    return new xds.SubmissionSet 'entryUUID', 'availabilityStatus', 'submissionTime', 'patientId', 'sourceId', 'uniqueId', { code: 'contentTypeCode', name: 'contentTypeName', scheme: 'contentTypeScheme' }, [ new xds.Slot 'authorSlot', 'authorVal' ]
+
   checkGeneralClassification = (doc, clazzScheme, name, code, scheme) ->
     select = xpath.useNamespaces
       'rim': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
@@ -152,7 +158,7 @@ describe 'XDS class Tests', ->
   describe 'DocumentEntry class', ->
 
     it 'should set the require attributes', ->
-      docEntry = new xds.DocumentEntry 'entryUUID', 'mimeType', 'availabilityStatus', 'hash', 'size', 'languageCode', 'repositoryUniqueId', 'sourcePatientId', 'patientId', 'uniqueId', 'creationTime', { code: 'clazzCode', name: 'clazzName', scheme: 'clazzScheme' }, { code: 'confidentialityCode', name: 'confidentialityName', scheme: 'confidentialityScheme' }, { code: 'eventCode', name: 'eventName', scheme: 'eventScheme' }, { code: 'formatCode', name: 'formatName', scheme: 'formatScheme' }, { code: 'healthcareFacilityTypeCode', name: 'healthcareFacilityTypeName', scheme: 'healthcareFacilityTypeScheme' }, { code: 'practiceSettingCode', name: 'practiceSettingName', scheme: 'practiceSettingScheme' }, { code: 'typeCode', name: 'typeName', scheme: 'typeScheme' }, [ new xds.Slot 'authorSlot', 'authorVal' ]
+      docEntry = constructTestDocEntry()
       xml = js2xml 'ExtrinsicObject', docEntry
       doc = new dom().parseFromString xml
       select = xpath.useNamespaces
@@ -169,7 +175,7 @@ describe 'XDS class Tests', ->
       objectType.should.be.exactly 'urn:uuid:7edca82f-054d-47f2-a032-9b2a5b5186c1'
 
     it 'should set the required slots', ->
-      docEntry = new xds.DocumentEntry 'entryUUID', 'mimeType', 'availabilityStatus', 'hash', 'size', 'languageCode', 'repositoryUniqueId', 'sourcePatientId', 'patientId', 'uniqueId', 'creationTime', { code: 'clazzCode', name: 'clazzName', scheme: 'clazzScheme' }, { code: 'confidentialityCode', name: 'confidentialityName', scheme: 'confidentialityScheme' }, { code: 'eventCode', name: 'eventName', scheme: 'eventScheme' }, { code: 'formatCode', name: 'formatName', scheme: 'formatScheme' }, { code: 'healthcareFacilityTypeCode', name: 'healthcareFacilityTypeName', scheme: 'healthcareFacilityTypeScheme' }, { code: 'practiceSettingCode', name: 'practiceSettingName', scheme: 'practiceSettingScheme' }, { code: 'typeCode', name: 'typeName', scheme: 'typeScheme' }, [ new xds.Slot 'authorSlot', 'authorVal' ]
+      docEntry = constructTestDocEntry()
       xml = js2xml 'ExtrinsicObject', docEntry
       doc = new dom().parseFromString xml
       select = xpath.useNamespaces
@@ -190,70 +196,70 @@ describe 'XDS class Tests', ->
       creationTime.should.be.exactly true
 
     it 'should set classCode classification', ->
-      docEntry = new xds.DocumentEntry 'entryUUID', 'mimeType', 'availabilityStatus', 'hash', 'size', 'languageCode', 'repositoryUniqueId', 'sourcePatientId', 'patientId', 'uniqueId', 'creationTime', { code: 'clazzCode', name: 'clazzName', scheme: 'clazzScheme' }, { code: 'confidentialityCode', name: 'confidentialityName', scheme: 'confidentialityScheme' }, { code: 'eventCode', name: 'eventName', scheme: 'eventScheme' }, { code: 'formatCode', name: 'formatName', scheme: 'formatScheme' }, { code: 'healthcareFacilityTypeCode', name: 'healthcareFacilityTypeName', scheme: 'healthcareFacilityTypeScheme' }, { code: 'practiceSettingCode', name: 'practiceSettingName', scheme: 'practiceSettingScheme' }, { code: 'typeCode', name: 'typeName', scheme: 'typeScheme' }, [ new xds.Slot 'authorSlot', 'authorVal' ]
+      docEntry = constructTestDocEntry()
       xml = js2xml 'ExtrinsicObject', docEntry
       doc = new dom().parseFromString xml
 
       checkGeneralClassification doc, 'urn:uuid:41a5887f-8865-4c09-adf7-e362475b143a', 'clazzName', 'clazzCode', 'clazzScheme'
 
     it 'should set confidentialityCode classification', ->
-      docEntry = new xds.DocumentEntry 'entryUUID', 'mimeType', 'availabilityStatus', 'hash', 'size', 'languageCode', 'repositoryUniqueId', 'sourcePatientId', 'patientId', 'uniqueId', 'creationTime', { code: 'clazzCode', name: 'clazzName', scheme: 'clazzScheme' }, { code: 'confidentialityCode', name: 'confidentialityName', scheme: 'confidentialityScheme' }, { code: 'eventCode', name: 'eventName', scheme: 'eventScheme' }, { code: 'formatCode', name: 'formatName', scheme: 'formatScheme' }, { code: 'healthcareFacilityTypeCode', name: 'healthcareFacilityTypeName', scheme: 'healthcareFacilityTypeScheme' }, { code: 'practiceSettingCode', name: 'practiceSettingName', scheme: 'practiceSettingScheme' }, { code: 'typeCode', name: 'typeName', scheme: 'typeScheme' }, [ new xds.Slot 'authorSlot', 'authorVal' ]
+      docEntry = constructTestDocEntry()
       xml = js2xml 'ExtrinsicObject', docEntry
       doc = new dom().parseFromString xml
 
       checkGeneralClassification doc, 'urn:uuid:f4f85eac-e6cb-4883-b524-f2705394840f', 'confidentialityName', 'confidentialityCode', 'confidentialityScheme'
       
     it 'should set eventCode classification', ->
-      docEntry = new xds.DocumentEntry 'entryUUID', 'mimeType', 'availabilityStatus', 'hash', 'size', 'languageCode', 'repositoryUniqueId', 'sourcePatientId', 'patientId', 'uniqueId', 'creationTime', { code: 'clazzCode', name: 'clazzName', scheme: 'clazzScheme' }, { code: 'confidentialityCode', name: 'confidentialityName', scheme: 'confidentialityScheme' }, { code: 'eventCode', name: 'eventName', scheme: 'eventScheme' }, { code: 'formatCode', name: 'formatName', scheme: 'formatScheme' }, { code: 'healthcareFacilityTypeCode', name: 'healthcareFacilityTypeName', scheme: 'healthcareFacilityTypeScheme' }, { code: 'practiceSettingCode', name: 'practiceSettingName', scheme: 'practiceSettingScheme' }, { code: 'typeCode', name: 'typeName', scheme: 'typeScheme' }, [ new xds.Slot 'authorSlot', 'authorVal' ]
+      docEntry = constructTestDocEntry()
       xml = js2xml 'ExtrinsicObject', docEntry
       doc = new dom().parseFromString xml
 
       checkGeneralClassification doc, 'urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4', 'eventName', 'eventCode', 'eventScheme'
 
     it 'should set formatCode classification', ->
-      docEntry = new xds.DocumentEntry 'entryUUID', 'mimeType', 'availabilityStatus', 'hash', 'size', 'languageCode', 'repositoryUniqueId', 'sourcePatientId', 'patientId', 'uniqueId', 'creationTime', { code: 'clazzCode', name: 'clazzName', scheme: 'clazzScheme' }, { code: 'confidentialityCode', name: 'confidentialityName', scheme: 'confidentialityScheme' }, { code: 'eventCode', name: 'eventName', scheme: 'eventScheme' }, { code: 'formatCode', name: 'formatName', scheme: 'formatScheme' }, { code: 'healthcareFacilityTypeCode', name: 'healthcareFacilityTypeName', scheme: 'healthcareFacilityTypeScheme' }, { code: 'practiceSettingCode', name: 'practiceSettingName', scheme: 'practiceSettingScheme' }, { code: 'typeCode', name: 'typeName', scheme: 'typeScheme' }, [ new xds.Slot 'authorSlot', 'authorVal' ]
+      docEntry = constructTestDocEntry()
       xml = js2xml 'ExtrinsicObject', docEntry
       doc = new dom().parseFromString xml
 
       checkGeneralClassification doc, 'urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d', 'formatName', 'formatCode', 'formatScheme'
 
     it 'should set healthcareFacilityTypeCode classification', ->
-      docEntry = new xds.DocumentEntry 'entryUUID', 'mimeType', 'availabilityStatus', 'hash', 'size', 'languageCode', 'repositoryUniqueId', 'sourcePatientId', 'patientId', 'uniqueId', 'creationTime', { code: 'clazzCode', name: 'clazzName', scheme: 'clazzScheme' }, { code: 'confidentialityCode', name: 'confidentialityName', scheme: 'confidentialityScheme' }, { code: 'eventCode', name: 'eventName', scheme: 'eventScheme' }, { code: 'formatCode', name: 'formatName', scheme: 'formatScheme' }, { code: 'healthcareFacilityTypeCode', name: 'healthcareFacilityTypeName', scheme: 'healthcareFacilityTypeScheme' }, { code: 'practiceSettingCode', name: 'practiceSettingName', scheme: 'practiceSettingScheme' }, { code: 'typeCode', name: 'typeName', scheme: 'typeScheme' }, [ new xds.Slot 'authorSlot', 'authorVal' ]
+      docEntry = constructTestDocEntry()
       xml = js2xml 'ExtrinsicObject', docEntry
       doc = new dom().parseFromString xml
 
       checkGeneralClassification doc, 'urn:uuid:f33fb8ac-18af-42cc-ae0e-ed0b0bdb91e1', 'healthcareFacilityTypeName', 'healthcareFacilityTypeCode', 'healthcareFacilityTypeScheme'
 
     it 'should set practiceSettingCode classification', ->
-      docEntry = new xds.DocumentEntry 'entryUUID', 'mimeType', 'availabilityStatus', 'hash', 'size', 'languageCode', 'repositoryUniqueId', 'sourcePatientId', 'patientId', 'uniqueId', 'creationTime', { code: 'clazzCode', name: 'clazzName', scheme: 'clazzScheme' }, { code: 'confidentialityCode', name: 'confidentialityName', scheme: 'confidentialityScheme' }, { code: 'eventCode', name: 'eventName', scheme: 'eventScheme' }, { code: 'formatCode', name: 'formatName', scheme: 'formatScheme' }, { code: 'healthcareFacilityTypeCode', name: 'healthcareFacilityTypeName', scheme: 'healthcareFacilityTypeScheme' }, { code: 'practiceSettingCode', name: 'practiceSettingName', scheme: 'practiceSettingScheme' }, { code: 'typeCode', name: 'typeName', scheme: 'typeScheme' }, [ new xds.Slot 'authorSlot', 'authorVal' ]
+      docEntry = constructTestDocEntry()
       xml = js2xml 'ExtrinsicObject', docEntry
       doc = new dom().parseFromString xml
 
       checkGeneralClassification doc, 'urn:uuid:cccf5598-8b07-4b77-a05e-ae952c785ead', 'practiceSettingName', 'practiceSettingCode', 'practiceSettingScheme'
 
     it 'should set typeCode classification', ->
-      docEntry = new xds.DocumentEntry 'entryUUID', 'mimeType', 'availabilityStatus', 'hash', 'size', 'languageCode', 'repositoryUniqueId', 'sourcePatientId', 'patientId', 'uniqueId', 'creationTime', { code: 'clazzCode', name: 'clazzName', scheme: 'clazzScheme' }, { code: 'confidentialityCode', name: 'confidentialityName', scheme: 'confidentialityScheme' }, { code: 'eventCode', name: 'eventName', scheme: 'eventScheme' }, { code: 'formatCode', name: 'formatName', scheme: 'formatScheme' }, { code: 'healthcareFacilityTypeCode', name: 'healthcareFacilityTypeName', scheme: 'healthcareFacilityTypeScheme' }, { code: 'practiceSettingCode', name: 'practiceSettingName', scheme: 'practiceSettingScheme' }, { code: 'typeCode', name: 'typeName', scheme: 'typeScheme' }, [ new xds.Slot 'authorSlot', 'authorVal' ]
+      docEntry = constructTestDocEntry()
       xml = js2xml 'ExtrinsicObject', docEntry
       doc = new dom().parseFromString xml
 
       checkGeneralClassification doc, 'urn:uuid:f0306f51-975f-434e-a61c-c59651d33983', 'typeName', 'typeCode', 'typeScheme'
 
     it 'should set the patientId external identifier', ->
-      docEntry = new xds.DocumentEntry 'entryUUID', 'mimeType', 'availabilityStatus', 'hash', 'size', 'languageCode', 'repositoryUniqueId', 'sourcePatientId', 'patientId', 'uniqueId', 'creationTime', { code: 'clazzCode', name: 'clazzName', scheme: 'clazzScheme' }, { code: 'confidentialityCode', name: 'confidentialityName', scheme: 'confidentialityScheme' }, { code: 'eventCode', name: 'eventName', scheme: 'eventScheme' }, { code: 'formatCode', name: 'formatName', scheme: 'formatScheme' }, { code: 'healthcareFacilityTypeCode', name: 'healthcareFacilityTypeName', scheme: 'healthcareFacilityTypeScheme' }, { code: 'practiceSettingCode', name: 'practiceSettingName', scheme: 'practiceSettingScheme' }, { code: 'typeCode', name: 'typeName', scheme: 'typeScheme' }, [ new xds.Slot 'authorSlot', 'authorVal' ]
+      docEntry = constructTestDocEntry()
       xml = js2xml 'ExtrinsicObject', docEntry
       doc = new dom().parseFromString xml
 
       checkGeneralExternalIdentifier doc, 'urn:uuid:58a6f841-87b3-4a3e-92fd-a8ffeff98427', 'XDSDocumentEntry.patientId', 'entryUUID', 'patientId'
 
     it 'should set the uniqueId external identifier', ->
-      docEntry = new xds.DocumentEntry 'entryUUID', 'mimeType', 'availabilityStatus', 'hash', 'size', 'languageCode', 'repositoryUniqueId', 'sourcePatientId', 'patientId', 'uniqueId', 'creationTime', { code: 'clazzCode', name: 'clazzName', scheme: 'clazzScheme' }, { code: 'confidentialityCode', name: 'confidentialityName', scheme: 'confidentialityScheme' }, { code: 'eventCode', name: 'eventName', scheme: 'eventScheme' }, { code: 'formatCode', name: 'formatName', scheme: 'formatScheme' }, { code: 'healthcareFacilityTypeCode', name: 'healthcareFacilityTypeName', scheme: 'healthcareFacilityTypeScheme' }, { code: 'practiceSettingCode', name: 'practiceSettingName', scheme: 'practiceSettingScheme' }, { code: 'typeCode', name: 'typeName', scheme: 'typeScheme' }, [ new xds.Slot 'authorSlot', 'authorVal' ]
+      docEntry = constructTestDocEntry()
       xml = js2xml 'ExtrinsicObject', docEntry
       doc = new dom().parseFromString xml
 
       checkGeneralExternalIdentifier doc, 'urn:uuid:2e82c1f6-a085-4c72-9da3-8640a32e42ab', 'XDSDocumentEntry.uniqueId', 'entryUUID', 'uniqueId'
 
     it 'should set author classification', ->
-      docEntry = new xds.DocumentEntry 'entryUUID', 'mimeType', 'availabilityStatus', 'hash', 'size', 'languageCode', 'repositoryUniqueId', 'sourcePatientId', 'patientId', 'uniqueId', 'creationTime', { code: 'clazzCode', name: 'clazzName', scheme: 'clazzScheme' }, { code: 'confidentialityCode', name: 'confidentialityName', scheme: 'confidentialityScheme' }, { code: 'eventCode', name: 'eventName', scheme: 'eventScheme' }, { code: 'formatCode', name: 'formatName', scheme: 'formatScheme' }, { code: 'healthcareFacilityTypeCode', name: 'healthcareFacilityTypeName', scheme: 'healthcareFacilityTypeScheme' }, { code: 'practiceSettingCode', name: 'practiceSettingName', scheme: 'practiceSettingScheme' }, { code: 'typeCode', name: 'typeName', scheme: 'typeScheme' }, [ new xds.Slot 'authorSlot', 'authorVal' ]
+      docEntry = constructTestDocEntry()
       xml = js2xml 'ExtrinsicObject', docEntry
       doc = new dom().parseFromString xml
       select = xpath.useNamespaces
@@ -278,35 +284,35 @@ describe 'XDS class Tests', ->
       avalabilityStatus.should.be.exactly 'availabilityStatus'
 
     it 'should set contentTypeCode classification', ->
-      subSet = new xds.SubmissionSet 'entryUUID', 'availabilityStatus', 'submissionTime', 'patientId', 'sourceId', 'uniqueId', { code: 'contentTypeCode', name: 'contentTypeName', scheme: 'contentTypeScheme' }, [ new xds.Slot 'authorSlot', 'authorVal' ]
+      subSet = constructTestSubSet()
       xml = js2xml 'RegistryPackage', subSet
       doc = new dom().parseFromString xml
 
       checkGeneralClassification doc, 'urn:uuid:aa543740-bdda-424e-8c96-df4873be8500', 'contentTypeName', 'contentTypeCode', 'contentTypeScheme'
 
     it 'should set the patientId external identifier', ->
-      subSet = new xds.SubmissionSet 'entryUUID', 'availabilityStatus', 'submissionTime', 'patientId', 'sourceId', 'uniqueId', { code: 'contentTypeCode', name: 'contentTypeName', scheme: 'contentTypeScheme' }, [ new xds.Slot 'authorSlot', 'authorVal' ]
+      subSet = constructTestSubSet()
       xml = js2xml 'RegistryPackage', subSet
       doc = new dom().parseFromString xml
 
       checkGeneralExternalIdentifier doc, 'urn:uuid:6b5aea1a-874d-4603-a4bc-96a0a7b38446', 'XDSSubmissionSet.patientId', 'entryUUID', 'patientId'
 
     it 'should set the sourceId external identifier', ->
-      subSet = new xds.SubmissionSet 'entryUUID', 'availabilityStatus', 'submissionTime', 'patientId', 'sourceId', 'uniqueId', { code: 'contentTypeCode', name: 'contentTypeName', scheme: 'contentTypeScheme' }, [ new xds.Slot 'authorSlot', 'authorVal' ]
+      subSet = constructTestSubSet()
       xml = js2xml 'RegistryPackage', subSet
       doc = new dom().parseFromString xml
 
       checkGeneralExternalIdentifier doc, 'urn:uuid:554ac39e-e3fe-47fe-b233-965d2a147832', 'XDSSubmissionSet.sourceId', 'entryUUID', 'sourceId'
 
     it 'should set the uniqueId external identifier', ->
-      subSet = new xds.SubmissionSet 'entryUUID', 'availabilityStatus', 'submissionTime', 'patientId', 'sourceId', 'uniqueId', { code: 'contentTypeCode', name: 'contentTypeName', scheme: 'contentTypeScheme' }, [ new xds.Slot 'authorSlot', 'authorVal' ]
+      subSet = constructTestSubSet()
       xml = js2xml 'RegistryPackage', subSet
       doc = new dom().parseFromString xml
 
       checkGeneralExternalIdentifier doc, 'urn:uuid:96fdda7c-d067-4183-912e-bf5ee74998a8', 'XDSSubmissionSet.uniqueId', 'entryUUID', 'uniqueId'
 
     it 'should set author classification', ->
-      subSet = new xds.SubmissionSet 'entryUUID', 'availabilityStatus', 'submissionTime', 'patientId', 'sourceId', 'uniqueId', { code: 'contentTypeCode', name: 'contentTypeName', scheme: 'contentTypeScheme' }, [ new xds.Slot 'authorSlot', 'authorVal' ]
+      subSet = constructTestSubSet()
       xml = js2xml 'RegistryPackage', subSet
       doc = new dom().parseFromString xml
       select = xpath.useNamespaces
@@ -320,12 +326,12 @@ describe 'XDS class Tests', ->
     it 'should set the submissions set', ->
       pnr = new xds.ProvideAndRegisterDocumentSetRequest(
         [
-          new xds.DocumentEntry 'entryUUID', 'mimeType', 'availabilityStatus', 'hash', 'size', 'languageCode', 'repositoryUniqueId', 'sourcePatientId', 'patientId', 'uniqueId', 'creationTime', { code: 'clazzCode', name: 'clazzName', scheme: 'clazzScheme' }, { code: 'confidentialityCode', name: 'confidentialityName', scheme: 'confidentialityScheme' }, { code: 'eventCode', name: 'eventName', scheme: 'eventScheme' }, { code: 'formatCode', name: 'formatName', scheme: 'formatScheme' }, { code: 'healthcareFacilityTypeCode', name: 'healthcareFacilityTypeName', scheme: 'healthcareFacilityTypeScheme' }, { code: 'practiceSettingCode', name: 'practiceSettingName', scheme: 'practiceSettingScheme' }, { code: 'typeCode', name: 'typeName', scheme: 'typeScheme' }, [ new xds.Slot 'authorSlot', 'authorVal' ]
+          constructTestDocEntry()
           ,
-          new xds.DocumentEntry 'entryUUID', 'mimeType', 'availabilityStatus', 'hash', 'size', 'languageCode', 'repositoryUniqueId', 'sourcePatientId', 'patientId', 'uniqueId', 'creationTime', { code: 'clazzCode', name: 'clazzName', scheme: 'clazzScheme' }, { code: 'confidentialityCode', name: 'confidentialityName', scheme: 'confidentialityScheme' }, { code: 'eventCode', name: 'eventName', scheme: 'eventScheme' }, { code: 'formatCode', name: 'formatName', scheme: 'formatScheme' }, { code: 'healthcareFacilityTypeCode', name: 'healthcareFacilityTypeName', scheme: 'healthcareFacilityTypeScheme' }, { code: 'practiceSettingCode', name: 'practiceSettingName', scheme: 'practiceSettingScheme' }, { code: 'typeCode', name: 'typeName', scheme: 'typeScheme' }, [ new xds.Slot 'authorSlot', 'authorVal' ]
+          constructTestDocEntry()
         ]
         ,
-        new xds.SubmissionSet 'entryUUID', 'availabilityStatus', 'submissionTime', 'patientId', 'sourceId', 'uniqueId', { code: 'contentTypeCode', name: 'contentTypeName', scheme: 'contentTypeScheme' }, [ new xds.Slot 'authorSlot', 'authorVal' ])
+        constructTestSubSet())
       xml = js2xml 'ProvideAndRegisterDocumentSetRequest', pnr
       doc = new dom().parseFromString xml
       select = xpath.useNamespaces
@@ -339,12 +345,12 @@ describe 'XDS class Tests', ->
     it 'should set the document entries', ->
       pnr = new xds.ProvideAndRegisterDocumentSetRequest(
         [
-          new xds.DocumentEntry 'entryUUID', 'mimeType', 'availabilityStatus', 'hash', 'size', 'languageCode', 'repositoryUniqueId', 'sourcePatientId', 'patientId', 'uniqueId', 'creationTime', { code: 'clazzCode', name: 'clazzName', scheme: 'clazzScheme' }, { code: 'confidentialityCode', name: 'confidentialityName', scheme: 'confidentialityScheme' }, { code: 'eventCode', name: 'eventName', scheme: 'eventScheme' }, { code: 'formatCode', name: 'formatName', scheme: 'formatScheme' }, { code: 'healthcareFacilityTypeCode', name: 'healthcareFacilityTypeName', scheme: 'healthcareFacilityTypeScheme' }, { code: 'practiceSettingCode', name: 'practiceSettingName', scheme: 'practiceSettingScheme' }, { code: 'typeCode', name: 'typeName', scheme: 'typeScheme' }, [ new xds.Slot 'authorSlot', 'authorVal' ]
+          constructTestDocEntry()
         ,
-          new xds.DocumentEntry 'entryUUID2', 'mimeType', 'availabilityStatus', 'hash', 'size', 'languageCode', 'repositoryUniqueId', 'sourcePatientId', 'patientId', 'uniqueId', 'creationTime', { code: 'clazzCode', name: 'clazzName', scheme: 'clazzScheme' }, { code: 'confidentialityCode', name: 'confidentialityName', scheme: 'confidentialityScheme' }, { code: 'eventCode', name: 'eventName', scheme: 'eventScheme' }, { code: 'formatCode', name: 'formatName', scheme: 'formatScheme' }, { code: 'healthcareFacilityTypeCode', name: 'healthcareFacilityTypeName', scheme: 'healthcareFacilityTypeScheme' }, { code: 'practiceSettingCode', name: 'practiceSettingName', scheme: 'practiceSettingScheme' }, { code: 'typeCode', name: 'typeName', scheme: 'typeScheme' }, [ new xds.Slot 'authorSlot', 'authorVal' ]
+          constructTestDocEntry()
         ]
         ,
-        new xds.SubmissionSet 'entryUUID', 'availabilityStatus', 'submissionTime', 'patientId', 'sourceId', 'uniqueId', { code: 'contentTypeCode', name: 'contentTypeName', scheme: 'contentTypeScheme' }, [ new xds.Slot 'authorSlot', 'authorVal' ])
+        constructTestSubSet())
       xml = js2xml 'ProvideAndRegisterDocumentSetRequest', pnr
       doc = new dom().parseFromString xml
       select = xpath.useNamespaces
