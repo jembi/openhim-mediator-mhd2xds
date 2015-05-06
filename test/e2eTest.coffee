@@ -40,11 +40,11 @@ mediatorResponse =
     response:
       status:         202
       body:           ''
-      timestamp:      new Date().getTime()   
+      timestamp:      new Date().getTime()
   ]
   properties:
-      pro1: "val"
-      pro2: "val"
+    pro1: "val"
+    pro2: "val"
 
 describe 'e2e integration tests', ->
 
