@@ -34,7 +34,8 @@ exports.Classification = class Classification
       'classificationNode': classNode
       'objectType': 'urn:oasis:names:tc:ebxml-regrep:ObjectType:RegistryObject:Classification'
     @Slot = []
-    @Name = new Name(name, 'UTF-8', 'us-en')
+    if name?
+      @Name = new Name(name, 'UTF-8', 'us-en')
 
     for slot in slots
       @Slot.push slot
@@ -198,7 +199,7 @@ exports.DocumentEntry = class DocumentEntry
 ###
 # SubmissionSet.
 #   entryUUID - in form 'urn:uuid:a6e06ca8-0c75-4064-9e5c-88b9045a96f6'
-#   avalabilityStatus - urn:oasis:names:tc:ebxml-regrep:StatusType:Approved or urn:oasis:names:tc:ebxml-regrep:StatusType:Deprecated
+#   availabilityStatus - urn:oasis:names:tc:ebxml-regrep:StatusType:Approved or urn:oasis:names:tc:ebxml-regrep:StatusType:Deprecated
 #   submissionTime - the point in time that the submission set was submitted in DTM format (YYYY[MM[DD[hh[mm[ss]]]]] in UTC time) eg. 20050102030405
 #   patientId - the patient id in the XDS affinity domain in CX form eg. 6578946^^^&amp;1.3.6.1.4.1.21367.2005.3.7&amp;ISO
 #   sourceId - the globally unique id of the entity that contributed the SubmissionSet, in OID format
@@ -207,11 +208,11 @@ exports.DocumentEntry = class DocumentEntry
 #   authorSlots - an array of Slot objects that contain author details, see ITI techinical framework section 4.2.3.1.4
 ###
 exports.SubmissionSet = class SubmissionSet
-  constructor: (entryUUID, avalabilityStatus, submissionTime, patientId, sourceId, uniqueId, contentType, authorSlots) ->
+  constructor: (entryUUID, availabilityStatus, submissionTime, patientId, sourceId, uniqueId, contentType, authorSlots) ->
     @['@'] =
       'xmlns': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
       'id': entryUUID
-      'status': avalabilityStatus
+      'status': availabilityStatus
 
     @Slot = []
 
@@ -233,7 +234,7 @@ exports.SubmissionSet = class SubmissionSet
     if authorSlots?
       authorClass = new Classification(
         null,
-        'urn:uuid:93606bcf-9494-43ec-9b4e-a7748d1a838d',
+        'urn:uuid:a7058bb9-b4e4-4307-ba5b-e3f0ab85e12d',
         entryUUID,
         null,
         null
@@ -307,13 +308,11 @@ exports.SoapHeader = class SoapHeader
 exports.ProvideAndRegisterDocumentSetRequest = class ProvideAndRegisterDocumentSetRequest
   constructor: (documentEntries, submissionSet) ->
     @['@'] =
-      'xmlns': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
-      'xmlns:xds': 'urn:ihe:iti:xds-b:2007'
+      'xmlns': 'urn:ihe:iti:xds-b:2007'
+      'xmlns:rim': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
       'xmlns:lcm': 'urn:oasis:names:tc:ebxml-regrep:xsd:lcm:3.0'
-      'xmlns:query': 'urn:oasis:names:tc:ebxml-regrep:xsd:query:3.0'
-      'xmlns:rs': 'urn:oasis:names:tc:ebxml-regrep:xsd:rs:3.0'
     @['lcm:SubmitObjectsRequest'] =
-      'RegistryObjectList':
+      'rim:RegistryObjectList':
         'ExtrinsicObject': []
         'RegistryPackage': submissionSet
         # Classisify registry package as a submission set
@@ -328,14 +327,14 @@ exports.ProvideAndRegisterDocumentSetRequest = class ProvideAndRegisterDocumentS
         'Document': []
 
     for documentEntry in documentEntries
-      @['lcm:SubmitObjectsRequest'].RegistryObjectList.ExtrinsicObject.push documentEntry
-      @['lcm:SubmitObjectsRequest'].RegistryObjectList.Association.push new Association(
+      @['lcm:SubmitObjectsRequest']['rim:RegistryObjectList'].ExtrinsicObject.push documentEntry
+      @['lcm:SubmitObjectsRequest']['rim:RegistryObjectList'].Association.push new Association(
         'urn:oasis:names:tc:ebxml-regrep:AssociationType:HasMember',
         submissionSet['@'].id,
         documentEntry['@'].id,
         new Slot('SubmissionSetStatus', 'Original')
       )
-      @['lcm:SubmitObjectsRequest'].RegistryObjectList.Document.push new Document(
+      @['lcm:SubmitObjectsRequest']['rim:RegistryObjectList'].Document.push new Document(
         documentEntry['@'].id,
         'cid:' + documentEntry['@'].id.replace('urn:uuid:', '') + '@ihe.net'
       )
