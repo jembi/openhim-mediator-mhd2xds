@@ -361,10 +361,13 @@ describe 'XDS class Tests', ->
         'lcm': 'urn:oasis:names:tc:ebxml-regrep:xsd:lcm:3.0'
         'xds': 'urn:ihe:iti:xds-b:2007'
 
-      exists = select 'count(//xds:ProvideAndRegisterDocumentSetRequest/lcm:SubmitObjectsRequest/rim:RegistryObjectList/rim:ExtrinsicObject)', doc
-      exists.should.be.exactly 2
+      eoExists = select 'count(//xds:ProvideAndRegisterDocumentSetRequest/lcm:SubmitObjectsRequest/rim:RegistryObjectList/rim:ExtrinsicObject)', doc
+      associationExists = select 'count(//xds:ProvideAndRegisterDocumentSetRequest/lcm:SubmitObjectsRequest/rim:RegistryObjectList/rim:Association)', doc
+      docExists = select 'count(//xds:ProvideAndRegisterDocumentSetRequest/xds:Document)', doc
 
-    # TODO: association and document element
+      eoExists.should.be.exactly 2
+      associationExists.should.be.exactly 2
+      docExists.should.be.exactly 2
 
   describe 'SoapHeader class', ->
 
@@ -391,7 +394,6 @@ describe 'XDS class Tests', ->
     it 'should set the require soap envelope attributes', ->
       env = new xds.SoapEnvelope constructTestPNR()
       xml = js2xml 'Envelope', env
-      console.log xml
       doc = new dom().parseFromString xml
       select = xpath.useNamespaces
         'soap': 'http://www.w3.org/2003/05/soap-envelope'

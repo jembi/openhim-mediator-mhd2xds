@@ -325,7 +325,7 @@ exports.ProvideAndRegisterDocumentSetRequest = class ProvideAndRegisterDocumentS
           'urn:uuid:a54d6aa5-d40d-43f9-88c5-b4633d873bdd',
           null)
         'Association': []
-        'Document': []
+    @Document = []
 
     for documentEntry in documentEntries
       @['lcm:SubmitObjectsRequest']['rim:RegistryObjectList'].ExtrinsicObject.push documentEntry
@@ -335,7 +335,7 @@ exports.ProvideAndRegisterDocumentSetRequest = class ProvideAndRegisterDocumentS
         documentEntry['@'].id,
         new Slot('SubmissionSetStatus', 'Original')
       )
-      @['lcm:SubmitObjectsRequest']['rim:RegistryObjectList'].Document.push new Document(
+      @Document.push new Document(
         documentEntry['@'].id,
         'cid:' + documentEntry['@'].id.replace('urn:uuid:', '') + '@ihe.net'
       )
