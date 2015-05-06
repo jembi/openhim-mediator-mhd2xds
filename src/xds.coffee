@@ -269,7 +269,7 @@ exports.Association = class Association
     @['@'] =
       'xmlns': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
       'associationType': type
-      'id': 'urn:uuid:c9abae3c-688f-4505-a136-bd99ca5019fb'
+      'id': 'urn:uuid:' + uuid.v4()
       'sourceObject': srcObj
       'targetObject': targetObj
     @Slot = slot
@@ -279,9 +279,9 @@ exports.Document = class Document
     @['@'] =
       'xmlns': 'urn:ihe:iti:xds-b:2007'
       'id': id
-    @['xop:Include'] =
+    @['Include'] =
       '@':
-        'xmlns:xop': 'http://www.w3.org/2004/08/xop/include'
+        'xmlns': 'http://www.w3.org/2004/08/xop/include'
         'href': href
 
 exports.SoapHeader = class SoapHeader

@@ -389,7 +389,7 @@ describe 'XDS class Tests', ->
       messageID.should.be.exactly 'MessageID'
       replyTo.should.be.exactly 'http://www.w3.org/2005/08/addressing/anonymous'
 
-  describe 'SaopEnvelope class', ->
+  describe 'SoapEnvelope class', ->
 
     it 'should set the require soap envelope attributes', ->
       env = new xds.SoapEnvelope constructTestPNR()
@@ -404,3 +404,38 @@ describe 'XDS class Tests', ->
 
       headerExists.should.be.exactly true
       pnrExists.should.be.exactly true
+
+  describe 'Association class', ->
+
+    it 'should set require association attributes', ->
+      association = new xds.Association 'type', 'srcObj', 'targetObj', new xds.Slot 'name', 'val'
+      xml = js2xml 'Association', association
+      doc = new dom().parseFromString xml
+      select = xpath.useNamespaces
+        'rim': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
+
+      type = select 'string(//rim:Association/@associationType)', doc
+      srcObj = select 'string(//rim:Association/@sourceObject)', doc
+      targetObj = select 'string(//rim:Association/@targetObject)', doc
+      slotExists = select 'boolean(//rim:Association/rim:Slot)', doc
+
+      type.should.be.exactly 'type'
+      srcObj.should.be.exactly 'srcObj'
+      targetObj.should.be.exactly 'targetObj'
+      slotExists.should.be.exactly true
+
+  describe 'Document class', ->
+
+    it 'should set require document attributes', ->
+      doc = new xds.Document 'id', 'href'
+      xml = js2xml 'Document', doc
+      doc = new dom().parseFromString xml
+      select = xpath.useNamespaces
+        'xds': 'urn:ihe:iti:xds-b:2007'
+        'xop': 'http://www.w3.org/2004/08/xop/include'
+
+      id = select 'string(//xds:Document/@id)', doc
+      href = select 'string(//xds:Document/xop:Include/@href)', doc
+
+      id.should.be.exactly 'id'
+      href.should.be.exactly 'href'
