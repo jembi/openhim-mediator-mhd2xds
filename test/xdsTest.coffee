@@ -1,5 +1,4 @@
 xds = require '../lib/xds'
-js2xml = require 'js2xmlparser'
 xpath = require 'xpath'
 dom = require('xmldom').DOMParser
 should = require 'should'
@@ -56,7 +55,7 @@ describe 'XDS class Tests', ->
 
     it 'should contain name, charset and lang', ->
       name = new xds.Name 'name', 'UTF-8', 'en-GB'
-      xml = js2xml 'Name', name
+      xml = name.toXml()
       doc = new dom().parseFromString xml
       select = xpath.useNamespaces
         'rim': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
@@ -73,7 +72,7 @@ describe 'XDS class Tests', ->
 
     it 'should contain name', ->
       slot = new xds.Slot 'name', 'val'
-      xml = js2xml 'Slot', slot
+      xml = slot.toXml()
       doc = new dom().parseFromString xml
       select = xpath.useNamespaces
         'rim': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
@@ -84,7 +83,7 @@ describe 'XDS class Tests', ->
 
     it 'should contain single value', ->
       slot = new xds.Slot 'name', 'val1'
-      xml = js2xml 'Slot', slot
+      xml = slot.toXml()
       doc = new dom().parseFromString xml
       select = xpath.useNamespaces
         'rim': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
@@ -97,7 +96,7 @@ describe 'XDS class Tests', ->
 
     it 'should contain multiple values', ->
       slot = new xds.Slot 'name', 'val1', 'val2', 'val3'
-      xml = js2xml 'Slot', slot
+      xml = slot.toXml()
       doc = new dom().parseFromString xml
       select = xpath.useNamespaces
         'rim': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
@@ -116,7 +115,7 @@ describe 'XDS class Tests', ->
 
     it 'should set name, scheme, obj, nodeRep and classNode', ->
       clazz = new xds.Classification 'name', 'scheme', 'obj', 'nodeRep', 'classNode'
-      xml = js2xml 'Classification', clazz
+      xml = clazz.toXml()
       doc = new dom().parseFromString xml
       select = xpath.useNamespaces
         'rim': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
@@ -137,7 +136,7 @@ describe 'XDS class Tests', ->
       slot1 = new xds.Slot 'name1', 'val1', 'val2', 'val3'
       slot2 = new xds.Slot 'name2', 'val1', 'val2'
       clazz = new xds.Classification 'name', 'scheme', 'obj', 'nodeRep', 'classNode', slot1, slot2
-      xml = js2xml 'Classification', clazz
+      xml = clazz.toXml()
       doc = new dom().parseFromString xml
       select = xpath.useNamespaces
         'rim': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
@@ -150,7 +149,7 @@ describe 'XDS class Tests', ->
 
     it 'should set name, scheme, regObj and value', ->
       ident = new xds.ExternalIdentifier 'name', 'scheme', 'regObj', 'value'
-      xml = js2xml 'ExternalIdentifier', ident
+      xml = ident.toXml()
       doc = new dom().parseFromString xml
       select = xpath.useNamespaces
         'rim': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
@@ -169,7 +168,7 @@ describe 'XDS class Tests', ->
 
     it 'should set the require attributes', ->
       docEntry = constructTestDocEntry()
-      xml = js2xml 'ExtrinsicObject', docEntry
+      xml = docEntry.toXml()
       doc = new dom().parseFromString xml
       select = xpath.useNamespaces
         'rim': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
@@ -186,7 +185,7 @@ describe 'XDS class Tests', ->
 
     it 'should set the required slots', ->
       docEntry = constructTestDocEntry()
-      xml = js2xml 'ExtrinsicObject', docEntry
+      xml = docEntry.toXml()
       doc = new dom().parseFromString xml
       select = xpath.useNamespaces
         'rim': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
@@ -207,70 +206,70 @@ describe 'XDS class Tests', ->
 
     it 'should set classCode classification', ->
       docEntry = constructTestDocEntry()
-      xml = js2xml 'ExtrinsicObject', docEntry
+      xml = docEntry.toXml()
       doc = new dom().parseFromString xml
 
       checkGeneralClassification doc, 'urn:uuid:41a5887f-8865-4c09-adf7-e362475b143a', 'clazzName', 'clazzCode', 'clazzScheme'
 
     it 'should set confidentialityCode classification', ->
       docEntry = constructTestDocEntry()
-      xml = js2xml 'ExtrinsicObject', docEntry
+      xml = docEntry.toXml()
       doc = new dom().parseFromString xml
 
       checkGeneralClassification doc, 'urn:uuid:f4f85eac-e6cb-4883-b524-f2705394840f', 'confidentialityName', 'confidentialityCode', 'confidentialityScheme'
       
     it 'should set eventCode classification', ->
       docEntry = constructTestDocEntry()
-      xml = js2xml 'ExtrinsicObject', docEntry
+      xml = docEntry.toXml()
       doc = new dom().parseFromString xml
 
       checkGeneralClassification doc, 'urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4', 'eventName', 'eventCode', 'eventScheme'
 
     it 'should set formatCode classification', ->
       docEntry = constructTestDocEntry()
-      xml = js2xml 'ExtrinsicObject', docEntry
+      xml = docEntry.toXml()
       doc = new dom().parseFromString xml
 
       checkGeneralClassification doc, 'urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d', 'formatName', 'formatCode', 'formatScheme'
 
     it 'should set healthcareFacilityTypeCode classification', ->
       docEntry = constructTestDocEntry()
-      xml = js2xml 'ExtrinsicObject', docEntry
+      xml = docEntry.toXml()
       doc = new dom().parseFromString xml
 
       checkGeneralClassification doc, 'urn:uuid:f33fb8ac-18af-42cc-ae0e-ed0b0bdb91e1', 'healthcareFacilityTypeName', 'healthcareFacilityTypeCode', 'healthcareFacilityTypeScheme'
 
     it 'should set practiceSettingCode classification', ->
       docEntry = constructTestDocEntry()
-      xml = js2xml 'ExtrinsicObject', docEntry
+      xml = docEntry.toXml()
       doc = new dom().parseFromString xml
 
       checkGeneralClassification doc, 'urn:uuid:cccf5598-8b07-4b77-a05e-ae952c785ead', 'practiceSettingName', 'practiceSettingCode', 'practiceSettingScheme'
 
     it 'should set typeCode classification', ->
       docEntry = constructTestDocEntry()
-      xml = js2xml 'ExtrinsicObject', docEntry
+      xml = docEntry.toXml()
       doc = new dom().parseFromString xml
 
       checkGeneralClassification doc, 'urn:uuid:f0306f51-975f-434e-a61c-c59651d33983', 'typeName', 'typeCode', 'typeScheme'
 
     it 'should set the patientId external identifier', ->
       docEntry = constructTestDocEntry()
-      xml = js2xml 'ExtrinsicObject', docEntry
+      xml = docEntry.toXml()
       doc = new dom().parseFromString xml
 
       checkGeneralExternalIdentifier doc, 'urn:uuid:58a6f841-87b3-4a3e-92fd-a8ffeff98427', 'XDSDocumentEntry.patientId', 'entryUUID', 'patientId'
 
     it 'should set the uniqueId external identifier', ->
       docEntry = constructTestDocEntry()
-      xml = js2xml 'ExtrinsicObject', docEntry
+      xml = docEntry.toXml()
       doc = new dom().parseFromString xml
 
       checkGeneralExternalIdentifier doc, 'urn:uuid:2e82c1f6-a085-4c72-9da3-8640a32e42ab', 'XDSDocumentEntry.uniqueId', 'entryUUID', 'uniqueId'
 
     it 'should set author classification', ->
       docEntry = constructTestDocEntry()
-      xml = js2xml 'ExtrinsicObject', docEntry
+      xml = docEntry.toXml()
       doc = new dom().parseFromString xml
       select = xpath.useNamespaces
         'rim': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
@@ -282,7 +281,7 @@ describe 'XDS class Tests', ->
 
     it 'should set the required attributes', ->
       subSet = new xds.SubmissionSet 'entryUUID', 'availabilityStatus', 'submissionTime', 'patientId', 'sourceId', 'uniqueId', { code: 'contentTypeCode', name: 'contentTypeName', scheme: 'contentTypeScheme' }, [ new xds.Slot 'authorSlot', 'authorVal' ]
-      xml = js2xml 'RegistryPackage', subSet
+      xml = subSet.toXml()
       doc = new dom().parseFromString xml
       select = xpath.useNamespaces
         'rim': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
@@ -295,35 +294,35 @@ describe 'XDS class Tests', ->
 
     it 'should set contentTypeCode classification', ->
       subSet = constructTestSubSet()
-      xml = js2xml 'RegistryPackage', subSet
+      xml = subSet.toXml()
       doc = new dom().parseFromString xml
 
       checkGeneralClassification doc, 'urn:uuid:aa543740-bdda-424e-8c96-df4873be8500', 'contentTypeName', 'contentTypeCode', 'contentTypeScheme'
 
     it 'should set the patientId external identifier', ->
       subSet = constructTestSubSet()
-      xml = js2xml 'RegistryPackage', subSet
+      xml = subSet.toXml()
       doc = new dom().parseFromString xml
 
       checkGeneralExternalIdentifier doc, 'urn:uuid:6b5aea1a-874d-4603-a4bc-96a0a7b38446', 'XDSSubmissionSet.patientId', 'entryUUID', 'patientId'
 
     it 'should set the sourceId external identifier', ->
       subSet = constructTestSubSet()
-      xml = js2xml 'RegistryPackage', subSet
+      xml = subSet.toXml()
       doc = new dom().parseFromString xml
 
       checkGeneralExternalIdentifier doc, 'urn:uuid:554ac39e-e3fe-47fe-b233-965d2a147832', 'XDSSubmissionSet.sourceId', 'entryUUID', 'sourceId'
 
     it 'should set the uniqueId external identifier', ->
       subSet = constructTestSubSet()
-      xml = js2xml 'RegistryPackage', subSet
+      xml = subSet.toXml()
       doc = new dom().parseFromString xml
 
       checkGeneralExternalIdentifier doc, 'urn:uuid:96fdda7c-d067-4183-912e-bf5ee74998a8', 'XDSSubmissionSet.uniqueId', 'entryUUID', 'uniqueId'
 
     it 'should set author classification', ->
       subSet = constructTestSubSet()
-      xml = js2xml 'RegistryPackage', subSet
+      xml = subSet.toXml()
       doc = new dom().parseFromString xml
       select = xpath.useNamespaces
         'rim': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
@@ -342,7 +341,7 @@ describe 'XDS class Tests', ->
         ]
         ,
         constructTestSubSet())
-      xml = js2xml 'ProvideAndRegisterDocumentSetRequest', pnr
+      xml = pnr.toXml()
       doc = new dom().parseFromString xml
       select = xpath.useNamespaces
         'rim': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
@@ -354,7 +353,7 @@ describe 'XDS class Tests', ->
 
     it 'should set the document entries', ->
       pnr = constructTestPNR()
-      xml = js2xml 'ProvideAndRegisterDocumentSetRequest', pnr
+      xml = pnr.toXml()
       doc = new dom().parseFromString xml
       select = xpath.useNamespaces
         'rim': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
@@ -373,7 +372,7 @@ describe 'XDS class Tests', ->
 
     it 'should set required soap header attributes', ->
       header = new xds.SoapHeader 'MessageID', 'to'
-      xml = js2xml 'Header', header
+      xml = header.toXml()
       doc = new dom().parseFromString xml
       select = xpath.useNamespaces
         'soap': 'http://www.w3.org/2003/05/soap-envelope'
@@ -393,7 +392,7 @@ describe 'XDS class Tests', ->
 
     it 'should set the require soap envelope attributes', ->
       env = new xds.SoapEnvelope constructTestPNR()
-      xml = js2xml 'Envelope', env
+      xml = env.toXml()
       doc = new dom().parseFromString xml
       select = xpath.useNamespaces
         'soap': 'http://www.w3.org/2003/05/soap-envelope'
@@ -409,7 +408,7 @@ describe 'XDS class Tests', ->
 
     it 'should set require association attributes', ->
       association = new xds.Association 'type', 'srcObj', 'targetObj', new xds.Slot 'name', 'val'
-      xml = js2xml 'Association', association
+      xml = association.toXml()
       doc = new dom().parseFromString xml
       select = xpath.useNamespaces
         'rim': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
@@ -428,7 +427,7 @@ describe 'XDS class Tests', ->
 
     it 'should set require document attributes', ->
       doc = new xds.Document 'id', 'href'
-      xml = js2xml 'Document', doc
+      xml = doc.toXml()
       doc = new dom().parseFromString xml
       select = xpath.useNamespaces
         'xds': 'urn:ihe:iti:xds-b:2007'

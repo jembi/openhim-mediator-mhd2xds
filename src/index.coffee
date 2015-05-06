@@ -1,5 +1,3 @@
-require('source-map-support').install()
-
 # load express
 express = require 'express'
 app = express()
@@ -23,7 +21,7 @@ if config.registration.enabled
 ##### Default Endpoint  #####
 app.post '/', (req, res) ->
 
-  console.log 'request recieved'
+  console.log 'Recieved request...'
 
   busboy = new Busboy headers: req.headers
 
@@ -43,7 +41,7 @@ app.post '/', (req, res) ->
         contentBufs.push chunk
 
   busboy.on 'finish', ->
-    console.log 'Finished parsing attachments'
+    console.log 'Finished parsing attachments...'
 
     xdsMeta = mhd2xds.mhd1Metadata2Xds metadata
 
@@ -79,14 +77,14 @@ app.post '/', (req, res) ->
           timestamp:      new Date().getTime()
 
       if xdsRes.headers['content-type'] is 'application/json+openhim'
-        console.log 'Recieved mediator response'
+        console.log 'Recieved mediator response...'
         # alter existing response object
         returnObject = JSON.parse body
         returnObject['x-mediator-urn'] = mediatorConfig.urn
         returnObject.orchestrations.push orchestration
         returnObject.response.status = if returnObject.status is 'Successful' then 201 else returnObject.response.status
       else
-        console.log 'Recieved non-mediator response'
+        console.log 'Recieved non-mediator response...'
         # set response
         status = if /urn:oasis:names:tc:ebxml-regrep:ResponseStatusType:Success/i.test(body) then 'Successful' else 'Failed'
         response =
@@ -104,13 +102,12 @@ app.post '/', (req, res) ->
           "orchestrations": [orchestration]
 
       # set content type header so that OpenHIM knows how to handle the response
-      console.log 'responding...' + returnObject.status
       res.writeHead returnObject.response.status, 'Content-Type': 'application/json+openhim'
       res.end JSON.stringify returnObject
-      console.log 'responded with: ' + JSON.stringify returnObject
+      console.log 'Responded.'
 
   # pipe request of to busboy for parsing
   req.pipe busboy
   
-# export app for use in grunt-express module
+# export app for use in grunt-express module and unit tests
 module.exports = app

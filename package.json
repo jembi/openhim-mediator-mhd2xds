@@ -4,7 +4,8 @@
   "description": "An OpenHIM mediator that converts MHD messages to XDS.b messages.",
   "scripts": {
     "prepublish": "grunt build",
-    "test": "grunt test"
+    "test": "grunt test",
+    "start": "grunt serve"
   },
   "license": "MPL2",
   "dependencies": {

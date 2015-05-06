@@ -68,7 +68,7 @@ exports.mhd1Metadata2Xds = (metadata) ->
   )
 
   pnrReq = new xds.ProvideAndRegisterDocumentSetRequest [docEntry], submissionSet
-  return js2xml 'soap:Envelope', new xds.SoapEnvelope pnrReq
+  return (new xds.SoapEnvelope pnrReq).toXml()
 
 exports.mhd2Metadata2Xds = (metadata) ->
   throw new Error 'Not implemented'

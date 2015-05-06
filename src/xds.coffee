@@ -1,4 +1,5 @@
 uuid = require 'node-uuid'
+js2xml = require 'js2xmlparser'
 
 exports.Name = class Name
   constructor: (name, charset, lang) ->
@@ -9,6 +10,9 @@ exports.Name = class Name
         'charset': charset
         'value': name
         'xml:lang': lang
+
+  toXml: ->
+    return js2xml 'Name', this
 
 exports.Slot = class Slot
   constructor: (name, vals...) ->
@@ -22,6 +26,9 @@ exports.Slot = class Slot
 
   addValue: (val) ->
     @ValueList.push 'Value': val
+
+  toXml: ->
+    return js2xml 'Slot', this
 
 exports.Classification = class Classification
   constructor: (name, scheme, obj, nodeRep, classNode, slots...) ->
@@ -43,6 +50,9 @@ exports.Classification = class Classification
   addSlot: (slot) ->
     @Slot.push slot
 
+  toXml: ->
+    return js2xml 'Classification', this
+
 exports.ExternalIdentifier = class ExternalIdentifier
   constructor: (name, scheme, regObj, value) ->
     @['@'] =
@@ -53,6 +63,9 @@ exports.ExternalIdentifier = class ExternalIdentifier
       'value': value
       'objectType': 'urn:oasis:names:tc:ebxml-regrep:ObjectType:RegistryObject:ExternalIdentifier'
     @Name = new Name(name, 'UTF-8', 'us-en')
+
+  toXml: ->
+    return js2xml 'ExternalIdentifier', this
 
 ###
 # DocumentEntry.
@@ -196,6 +209,9 @@ exports.DocumentEntry = class DocumentEntry
         uniqueId
       )
 
+  toXml: ->
+    return js2xml 'ExtrinsicObject', this
+
 ###
 # SubmissionSet.
 #   entryUUID - in form 'urn:uuid:a6e06ca8-0c75-4064-9e5c-88b9045a96f6'
@@ -264,6 +280,9 @@ exports.SubmissionSet = class SubmissionSet
         entryUUID,
         uniqueId)
 
+  toXml: ->
+    return js2xml 'RegistryPackage', this
+
 exports.Association = class Association
   constructor: (type, srcObj, targetObj, slot) ->
     @['@'] =
@@ -274,6 +293,9 @@ exports.Association = class Association
       'targetObject': targetObj
     @Slot = slot
 
+  toXml: ->
+    return js2xml 'Association', this
+
 exports.Document = class Document
   constructor: (id, href) ->
     @['@'] =
@@ -283,6 +305,9 @@ exports.Document = class Document
       '@':
         'xmlns': 'http://www.w3.org/2004/08/xop/include'
         'href': href
+
+  toXml: ->
+    return js2xml 'Document', this
 
 exports.SoapHeader = class SoapHeader
   constructor: (MessageID, to) ->
@@ -302,6 +327,9 @@ exports.SoapHeader = class SoapHeader
       '@':
         'mustUnderstand': 'true'
       'a:Address': 'http://www.w3.org/2005/08/addressing/anonymous'
+
+  toXml: ->
+    return js2xml 'Header', this
 
 ###
 # Produces a PNRRequest with the document element's href = <DocumentEntry.id>@ihe.net (minus the 'urn:uuid:' prefix if there is one)
@@ -340,6 +368,9 @@ exports.ProvideAndRegisterDocumentSetRequest = class ProvideAndRegisterDocumentS
         'cid:' + documentEntry['@'].id.replace('urn:uuid:', '') + '@ihe.net'
       )
 
+  toXml: ->
+    return js2xml 'ProvideAndRegisterDocumentSetRequest', this
+
 
 exports.SoapEnvelope = class SoapEnvelope
   constructor: (ProvideAndRegisterDocumentSetRequest) ->
@@ -348,3 +379,6 @@ exports.SoapEnvelope = class SoapEnvelope
     @['Header'] = new SoapHeader(uuid.v4())
     @['Body'] =
       'ProvideAndRegisterDocumentSetRequest': ProvideAndRegisterDocumentSetRequest
+
+  toXml: ->
+    return js2xml 'Envelope', this
