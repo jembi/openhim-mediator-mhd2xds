@@ -6,5 +6,10 @@
   },
   "registration": {
   	"enabled": true
+  },
+  "xdsRepo": {
+    "host": "localhost",
+    "port": "8500",
+    "path": "xdsrepository"
   }
 }

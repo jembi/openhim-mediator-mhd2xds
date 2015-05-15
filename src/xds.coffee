@@ -1,28 +1,40 @@
 uuid = require 'node-uuid'
+js2xml = require 'js2xmlparser'
 
 exports.Name = class Name
   constructor: (name, charset, lang) ->
+    @['@'] =
+      'xmlns': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
     @LocalizedString =
       '@':
         'charset': charset
         'value': name
         'xml:lang': lang
 
+  toXml: ->
+    return js2xml 'Name', this
+
 exports.Slot = class Slot
   constructor: (name, vals...) ->
     @['@'] =
+      'xmlns': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
       'name': name
-    @ValueList = []
+    @ValueList =
+      Value: []
 
     for val in vals
-      @ValueList.push 'Value': val
+      @ValueList.Value.push val
 
   addValue: (val) ->
     @ValueList.push 'Value': val
 
+  toXml: ->
+    return js2xml 'Slot', this
+
 exports.Classification = class Classification
   constructor: (name, scheme, obj, nodeRep, classNode, slots...) ->
     @['@'] =
+      'xmlns': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
       'id': 'urn:uuid:' + uuid.v4()
       'classificationScheme': scheme
       'classifiedObject': obj
@@ -30,7 +42,8 @@ exports.Classification = class Classification
       'classificationNode': classNode
       'objectType': 'urn:oasis:names:tc:ebxml-regrep:ObjectType:RegistryObject:Classification'
     @Slot = []
-    @Name = new Name(name, 'UTF-8', 'us-en')
+    if name?
+      @Name = new Name(name, 'UTF-8', 'us-en')
 
     for slot in slots
       @Slot.push slot
@@ -38,15 +51,22 @@ exports.Classification = class Classification
   addSlot: (slot) ->
     @Slot.push slot
 
+  toXml: ->
+    return js2xml 'Classification', this
+
 exports.ExternalIdentifier = class ExternalIdentifier
   constructor: (name, scheme, regObj, value) ->
     @['@'] =
+      'xmlns': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
       'id': 'urn:uuid:' + uuid.v4()
       'identificationScheme': scheme
       'registryObject': regObj
       'value': value
       'objectType': 'urn:oasis:names:tc:ebxml-regrep:ObjectType:RegistryObject:ExternalIdentifier'
     @Name = new Name(name, 'UTF-8', 'us-en')
+
+  toXml: ->
+    return js2xml 'ExternalIdentifier', this
 
 ###
 # DocumentEntry.
@@ -73,6 +93,7 @@ exports.ExternalIdentifier = class ExternalIdentifier
 exports.DocumentEntry = class DocumentEntry
   constructor: (entryUUID, mimeType, availabilityStatus, hash, size, languageCode, repositoryUniqueId, sourcePatientId, patientId, uniqueId, creationTime, clazz, confidentiality, event, format, healthcareFacilityType, practiceSetting, type, authorSlots) ->
     @['@'] =
+      'xmlns': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
       'id': entryUUID
       'mimeType': mimeType
       'objectType': 'urn:uuid:7edca82f-054d-47f2-a032-9b2a5b5186c1'
@@ -189,10 +210,22 @@ exports.DocumentEntry = class DocumentEntry
         uniqueId
       )
 
+  addSlot: (slot) ->
+    @Slot.push slot
+
+  addClassification: (clazz) ->
+    @Classification.push clazz
+
+  addExternalIdentifier: (externId) ->
+    @ExternalIdentifier.push externId
+
+  toXml: ->
+    return js2xml 'ExtrinsicObject', this
+
 ###
 # SubmissionSet.
 #   entryUUID - in form 'urn:uuid:a6e06ca8-0c75-4064-9e5c-88b9045a96f6'
-#   avalabilityStatus - urn:oasis:names:tc:ebxml-regrep:StatusType:Approved or urn:oasis:names:tc:ebxml-regrep:StatusType:Deprecated
+#   availabilityStatus - urn:oasis:names:tc:ebxml-regrep:StatusType:Approved or urn:oasis:names:tc:ebxml-regrep:StatusType:Deprecated
 #   submissionTime - the point in time that the submission set was submitted in DTM format (YYYY[MM[DD[hh[mm[ss]]]]] in UTC time) eg. 20050102030405
 #   patientId - the patient id in the XDS affinity domain in CX form eg. 6578946^^^&amp;1.3.6.1.4.1.21367.2005.3.7&amp;ISO
 #   sourceId - the globally unique id of the entity that contributed the SubmissionSet, in OID format
@@ -201,10 +234,11 @@ exports.DocumentEntry = class DocumentEntry
 #   authorSlots - an array of Slot objects that contain author details, see ITI techinical framework section 4.2.3.1.4
 ###
 exports.SubmissionSet = class SubmissionSet
-  constructor: (entryUUID, avalabilityStatus, submissionTime, patientId, sourceId, uniqueId, contentType, authorSlots) ->
+  constructor: (entryUUID, availabilityStatus, submissionTime, patientId, sourceId, uniqueId, contentType, authorSlots) ->
     @['@'] =
+      'xmlns': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
       'id': entryUUID
-      'status': avalabilityStatus
+      'status': availabilityStatus
 
     @Slot = []
 
@@ -226,7 +260,7 @@ exports.SubmissionSet = class SubmissionSet
     if authorSlots?
       authorClass = new Classification(
         null,
-        'urn:uuid:93606bcf-9494-43ec-9b4e-a7748d1a838d',
+        'urn:uuid:a7058bb9-b4e4-4307-ba5b-e3f0ab85e12d',
         entryUUID,
         null,
         null
@@ -256,41 +290,65 @@ exports.SubmissionSet = class SubmissionSet
         entryUUID,
         uniqueId)
 
+  addSlot: (slot) ->
+    @Slot.push slot
+
+  addClassification: (clazz) ->
+    @Classification.push clazz
+
+  addExternalIdentifier: (externId) ->
+    @ExternalIdentifier.push externId
+
+  toXml: ->
+    return js2xml 'RegistryPackage', this
+
 exports.Association = class Association
   constructor: (type, srcObj, targetObj, slot) ->
     @['@'] =
+      'xmlns': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
       'associationType': type
-      'id': 'urn:uuid:c9abae3c-688f-4505-a136-bd99ca5019fb'
+      'id': 'urn:uuid:' + uuid.v4()
       'sourceObject': srcObj
       'targetObject': targetObj
     @Slot = slot
 
+  toXml: ->
+    return js2xml 'Association', this
+
 exports.Document = class Document
   constructor: (id, href) ->
     @['@'] =
+      'xmlns': 'urn:ihe:iti:xds-b:2007'
       'id': id
-    @['xop:Include'] =
+    @['Include'] =
       '@':
-        'xmlns:xop': 'http://www.w3.org/2004/08/xop/include'
+        'xmlns': 'http://www.w3.org/2004/08/xop/include'
         'href': href
 
+  toXml: ->
+    return js2xml 'Document', this
+
 exports.SoapHeader = class SoapHeader
-  constructor: (MessageID) ->
+  constructor: (MessageID, to) ->
     @['@'] =
+      'xmlns': 'http://www.w3.org/2003/05/soap-envelope'
       'xmlns:a': 'http://www.w3.org/2005/08/addressing'
     @['a:Action'] =
       '@':
-        'soap:mustUnderstand': 'true'
+        'mustUnderstand': 'true'
       '#': 'urn:ihe:iti:2007:ProvideAndRegisterDocumentSet-b'
     @['a:To'] =
       '@':
-        'soap:mustUnderstand': 'true'
-      '#': 'https://localhost:5000/xdsrepository'
+        'mustUnderstand': 'true'
+      '#': to
     @['a:MessageID'] = MessageID
     @['a:ReplyTo'] =
       '@':
-        'soap:mustUnderstand': 'true'
+        'mustUnderstand': 'true'
       'a:Address': 'http://www.w3.org/2005/08/addressing/anonymous'
+
+  toXml: ->
+    return js2xml 'Header', this
 
 ###
 # Produces a PNRRequest with the document element's href = <DocumentEntry.id>@ihe.net (minus the 'urn:uuid:' prefix if there is one)
@@ -298,13 +356,11 @@ exports.SoapHeader = class SoapHeader
 exports.ProvideAndRegisterDocumentSetRequest = class ProvideAndRegisterDocumentSetRequest
   constructor: (documentEntries, submissionSet) ->
     @['@'] =
-      'xmlns': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
-      'xmlns:xds': 'urn:ihe:iti:xds-b:2007'
+      'xmlns': 'urn:ihe:iti:xds-b:2007'
+      'xmlns:rim': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
       'xmlns:lcm': 'urn:oasis:names:tc:ebxml-regrep:xsd:lcm:3.0'
-      'xmlns:query': 'urn:oasis:names:tc:ebxml-regrep:xsd:query:3.0'
-      'xmlns:rs': 'urn:oasis:names:tc:ebxml-regrep:xsd:rs:3.0'
     @['lcm:SubmitObjectsRequest'] =
-      'RegistryObjectList':
+      'rim:RegistryObjectList':
         'ExtrinsicObject': []
         'RegistryPackage': submissionSet
         # Classisify registry package as a submission set
@@ -316,26 +372,32 @@ exports.ProvideAndRegisterDocumentSetRequest = class ProvideAndRegisterDocumentS
           'urn:uuid:a54d6aa5-d40d-43f9-88c5-b4633d873bdd',
           null)
         'Association': []
-        'Document': []
+    @Document = []
 
     for documentEntry in documentEntries
-      @['lcm:SubmitObjectsRequest'].RegistryObjectList.ExtrinsicObject.push documentEntry
-      @['lcm:SubmitObjectsRequest'].RegistryObjectList.Association.push new Association(
+      @['lcm:SubmitObjectsRequest']['rim:RegistryObjectList'].ExtrinsicObject.push documentEntry
+      @['lcm:SubmitObjectsRequest']['rim:RegistryObjectList'].Association.push new Association(
         'urn:oasis:names:tc:ebxml-regrep:AssociationType:HasMember',
         submissionSet['@'].id,
         documentEntry['@'].id,
         new Slot('SubmissionSetStatus', 'Original')
       )
-      @['lcm:SubmitObjectsRequest'].RegistryObjectList.Document.push new Document(
+      @Document.push new Document(
         documentEntry['@'].id,
         'cid:' + documentEntry['@'].id.replace('urn:uuid:', '') + '@ihe.net'
       )
+
+  toXml: ->
+    return js2xml 'ProvideAndRegisterDocumentSetRequest', this
 
 
 exports.SoapEnvelope = class SoapEnvelope
   constructor: (ProvideAndRegisterDocumentSetRequest) ->
     @['@'] =
-      'xmlns:soap': 'http://www.w3.org/2003/05/soap-envelope'
-    @['soap:Header'] = new SoapHeader(uuid.v4())
-    @['soap:Body'] =
-      'xds:ProvideAndRegisterDocumentSetRequest': ProvideAndRegisterDocumentSetRequest
+      'xmlns': 'http://www.w3.org/2003/05/soap-envelope'
+    @['Header'] = new SoapHeader(uuid.v4())
+    @['Body'] =
+      'ProvideAndRegisterDocumentSetRequest': ProvideAndRegisterDocumentSetRequest
+
+  toXml: ->
+    return js2xml 'Envelope', this

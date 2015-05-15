@@ -4,17 +4,24 @@
   "description": "An OpenHIM mediator that converts MHD messages to XDS.b messages.",
   "scripts": {
     "prepublish": "grunt build",
-    "test": "grunt test"
+    "test": "grunt test",
+    "start": "grunt build && node lib/index.js"
   },
+  "bin": "./bin/mhd2xds.js",
   "license": "MPL2",
   "dependencies": {
     "busboy": "^0.2.9",
     "express": "^4.10.0",
+    "forever-monitor": "^1.5.2",
     "js2xmlparser": "^0.1.9",
     "needle": "^0.9.1",
     "node-uuid": "^1.4.3",
     "request": "^2.55.0",
-    "source-map-support": "^0.2.10"
+    "request-debug": "^0.1.1",
+    "source-map-support": "^0.2.10",
+    "uuid": "^2.0.1",
+    "xmldom": "^0.1.19",
+    "xpath": "0.0.9"
   },
   "devDependencies": {
     "coffee-script": "^1.9.1",
@@ -25,8 +32,8 @@
     "grunt-contrib-coffee": "^0.13.0",
     "grunt-contrib-copy": "~0.4.1",
     "grunt-contrib-watch": "^0.6.1",
-    "grunt-express": "^1.4.1",
     "grunt-mocha-cli": "^1.13.0",
+    "should": "^6.0.1",
     "supertest": "^0.15.0"
   }
 }
