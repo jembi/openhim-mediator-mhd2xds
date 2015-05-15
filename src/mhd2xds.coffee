@@ -14,9 +14,14 @@ exports.mhd1Metadata2XdsForMomconnect = (metadata, cda) ->
   birthDate = select 'string(//v3:ClinicalDocument/v3:recordTarget/v3:patientRole/v3:patient/v3:birthTime/@value)', doc
   birthDate = birthDate.replace '%', ''
 
-  authorId = select 'string(//v3:ClinicalDocument/v3:author/v3:assignedAuthor/v3:id/@extension)', doc
-  if authorId.length is 0 then authorId = 'unknown'
-  authorAssigningAuthorityId = select 'string(//v3:ClinicalDocument/v3:author/v3:assignedAuthor/v3:id/@root)', doc
+  authorPersonId = select 'string(//v3:ClinicalDocument/v3:author/v3:assignedAuthor/v3:assignedPerson/../v3:id/@extension)', doc
+  if authorPersonId.length is 0 then authorPersonId = 'unknown'
+  authorPersonAssigningAuthorityId = select 'string(//v3:ClinicalDocument/v3:author/v3:assignedAuthor/v3:assignedPerson/../v3:id/@root)', doc
+
+  authorMachineId = select 'string(//v3:ClinicalDocument/v3:author/v3:assignedAuthor/v3:assignedAuthoringDevice/../v3:id/@extension)', doc
+  if authorMachineId.length is 0 then authorMachineId = 'unknown'
+  authorMachineAssigningAuthorityId = select 'string(//v3:ClinicalDocument/v3:author/v3:assignedAuthor/v3:assignedAuthoringDevice/../v3:id/@root)', doc
+  authorMachineSoftwareName = select 'string(//v3:ClinicalDocument/v3:author/v3:assignedAuthor/v3:assignedAuthoringDevice/v3:softwareName)', doc
 
   gender = select 'string(//v3:ClinicalDocument/v3:recordTarget/v3:patientRole/v3:patient/v3:administrativeGenderCode/@code)', doc
 
@@ -39,12 +44,14 @@ exports.mhd1Metadata2XdsForMomconnect = (metadata, cda) ->
     seconds = '0' + seconds
   now = "#{year}#{month}#{day}#{hours}#{minutes}#{seconds}"
 
-  if metadata.documentEntry.patientId.indexOf '&' is -1 and metadata.documentEntry.patientId.indexOf 'ZAF' isnt -1
-    sourceId = metadata.documentEntry.patientId.replace 'ZAF', 'ZAF&0.0.0&ISO'
-  else
-    sourceId = metadata.documentEntry.patientId
+  patientIdCx = metadata.documentEntry.patientId
+  patientId = patientIdCx.substring(0, patientIdCx.indexOf('^'))
+  patientIdType = patientIdCx.substring(patientIdCx.indexOf('^^^')+3, patientIdCx.lastIndexOf('^'))
+  patientIdAssigningAuthority = patientIdCx.substring(patientIdCx.lastIndexOf('^')+1)
+  sourceId = "#{patientId}^^^&#{patientIdType}-#{patientIdAssigningAuthority}-526ef9c3-6f18-420a-bc53-9b733920bc67&ISO"
 
-  authorPersonSlot = new xds.Slot 'authorPerson', "#{authorId}^^^^^^^^&#{authorAssigningAuthorityId}&ISO"
+  authorPersonSlot = new xds.Slot 'authorPerson', "#{authorPersonId}^^^^^^^^&#{authorPersonAssigningAuthorityId}&ISO"
+  authorMachineSlot = new xds.Slot 'authorPerson', "#{authorMachineId}^#{authorMachineSoftwareName}^^^^^^^&#{authorMachineAssigningAuthorityId}&ISO"
 
   docEntry = new xds.DocumentEntry(
     metadata.documentEntry.entryUUID,
@@ -77,7 +84,7 @@ exports.mhd1Metadata2XdsForMomconnect = (metadata, cda) ->
       scheme: metadata.documentEntry.typeCode.codingScheme,
       name: metadata.documentEntry.typeCode.codeName
     },
-    [authorPersonSlot] # authorSlots
+    [authorPersonSlot, authorMachineSlot] # authorSlots
   )
 
   # sourcePatientId slot
@@ -96,7 +103,7 @@ exports.mhd1Metadata2XdsForMomconnect = (metadata, cda) ->
     null, # sourceId
     uuid.v4(),
     null, # contentType
-    [authorPersonSlot] # authorSlots
+    [authorPersonSlot, authorMachineSlot] # authorSlots
   )
 
   pnrReq = new xds.ProvideAndRegisterDocumentSetRequest [docEntry], submissionSet

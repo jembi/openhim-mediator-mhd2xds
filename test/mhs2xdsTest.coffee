@@ -55,6 +55,16 @@ describe 'mhs2xds unit tests', ->
       </representedOrganization>
       </assignedAuthor>
     </author>
+    <author>
+      <time value="20150305044455"/>
+      <assignedAuthor>
+        <id root="9a560d61-85f1-4d7b-8ee2-090d2900f836"/>
+        <assignedAuthoringDevice>
+          <code code="9876" codeSystem="56877fb7-e3a9-4ad5-bfb5-64d48a045e83"/>
+          <softwareName>Vumi</softwareName>
+        </assignedAuthoringDevice>
+      </assignedAuthor>
+    </author>
     <custodian>
       <assignedCustodian>
       <representedCustodianOrganization>
