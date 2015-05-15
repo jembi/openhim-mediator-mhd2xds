@@ -50,6 +50,7 @@ describe 'e2e integration tests', ->
 
   before (done) ->
     config.registration.enabled = false
+    config.xdsRepo.port = 6644
     app = require '../lib/index'
     app.listen 3200, ->
       done()
@@ -62,10 +63,9 @@ describe 'e2e integration tests', ->
     server = http.createServer (req, res) ->
       body = ''
       req.on 'data', (chunk) ->
-        body += chunk
+        body += chunk.toString()
 
       req.on 'end', () ->
-        # TODO: test body for correct MIME/XOP correctness
         console.log "The e2e server recieved:\n\n#{body}"
 
         res.writeHead 200, 'content-type': 'application/soap+xml'
@@ -74,7 +74,7 @@ describe 'e2e integration tests', ->
     server.listen 6644, ->
       mhd = fs.readFileSync('test/generated-mhd.txt').toString()
       request('http://localhost:3200')
-        .post('/')
+        .post('/xds')
         .set('content-type', 'multipart/form-data; boundary=48940923NODERESLTER3890457293')
         .send(mhd)
         .expect(201)
@@ -90,10 +90,9 @@ describe 'e2e integration tests', ->
     server = http.createServer (req, res) ->
       body = ''
       req.on 'data', (chunk) ->
-        body += chunk
+        body += chunk.toString()
 
       req.on 'end', () ->
-        # TODO: test body for correct MIME/XOP correctness
         console.log "The e2e server recieved:\n\n#{body}"
 
         res.writeHead 200, 'content-type': 'application/json+openhim'
@@ -102,7 +101,7 @@ describe 'e2e integration tests', ->
     server.listen 6644, ->
       mhd = fs.readFileSync('test/generated-mhd.txt').toString()
       request('http://localhost:3200')
-        .post('/')
+        .post('/xds')
         .set('content-type', 'multipart/form-data; boundary=48940923NODERESLTER3890457293')
         .send(mhd)
         .expect(201)

@@ -2,8 +2,135 @@ mhd2xds = require '../lib/mhd2xds'
 
 describe 'mhs2xds unit tests', ->
 
+  cda = """
+    <?xml version="1.0"?>
+    <ClinicalDocument xmlns="urn:hl7-org:v3" xmlns:cda="urn:hl7-org:v3" xmlns:voc="urn:hl7-org:v3/voc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pcc="urn:ihe:pcc:hl7v3" xmlns:lab="urn:oid:1.3.6.1.4.1.19376.1.3.2" xmlns:sdtc="urn:hl7-org:sdtc" xsi:schemaLocation="urn:hl7-org:v3 CDA.xsd">
+    <typeId root="2.16.840.1.113883.1.3" extension="POCD_HD000040"/>
+    <templateId root="2.16.840.1.113883.10" extension="IMPL_CDAR2_LEVEL1"/>
+    <id root="2.15.278071478427527610493133229150878247572"/>
+    <code code="51855-5" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"/>
+    <title>SA National Pregnancy Register - Patient Note</title>
+    <!-- Creation time of document, e.g. 20140217121212 -->
+    <effectiveTime value="20150305044455"/>
+    <confidentialityCode code="N" displayName="Normal" codeSystem="2.16.840.1.113883.5.25" codeSystemName="Confidentiality"/>
+    <languageCode code="en-UK"/>
+    <!-- Client details -->
+    <recordTarget>
+      <patientRole>
+      <id extension="1109354872442^^^ZAF^NI" root="526ef9c3-6f18-420a-bc53-9b733920bc67" />
+      <addr/>
+      <!-- Telephone number in RFC3966 format, e.g. tel:+27731234567 -->
+      <telecom value="tel:+27744444567"/>
+      <patient>
+        <name>
+        <given nullFlavor="NI"/>
+        <family nullFlavor="NI"/>
+        </name>
+        <administrativeGenderCode code="F" codeSystem="2.16.840.1.113883.5.1"/>
+        <!-- e.g. 19700123 -->
+        <birthTime value="19920305%"/>
+        <languageCommunication>
+        <languageCode code="eng"/>
+        <preferenceInd value="true"/>
+        </languageCommunication>
+      </patient>
+      </patientRole>
+    </recordTarget>
+    <!-- HCW Details -->
+    <author>
+      <time value="20150305044455"/>
+      <assignedAuthor>
+      <id extension="1234" root="833f2856-b9e1-4f54-8694-c74c4283755f" assigningAuthorityName="HCW Code"/>
+      <addr/>
+      <telecom value="tel:+27744444567"/>
+      <assignedPerson>
+        <name>
+        <given>Grace</given>
+        <family>Doctor</family>
+        </name>
+      </assignedPerson>
+      <representedOrganization>
+        <id extension="346351" root="ab8c9bd1-26e9-47bf-8bbe-3524fccb9f2c" assigningAuthorityName="Facility Code"/>
+        <name>Good Health Center</name>
+      </representedOrganization>
+      </assignedAuthor>
+    </author>
+    <custodian>
+      <assignedCustodian>
+      <representedCustodianOrganization>
+        <id root="a5881e6c-b42e-4559-a1fd-d1dc52379658"/>
+        <name>SA National Department of Health</name>
+      </representedCustodianOrganization>
+      </assignedCustodian>
+    </custodian>
+    <documentationOf>
+      <serviceEvent classCode="PCPR">
+      <effectiveTime value="20150305044455"/>
+      </serviceEvent>
+    </documentationOf>
+    <component>
+      <structuredBody>
+      <component>
+        <section>
+        <code code="57060-6" displayName="Estimated date of delivery Narrative" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"/>
+        <text>
+          <table>
+          <thead>
+            <tr>
+            <td>Pregnancy status</td>
+            <td>Note Date</td>
+            <td>Delivery Date (Estimated)</td>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- e.g. -->
+            <tr>
+            <td>Pregnancy confirmed</td>
+            <td>2014-05-14</td>
+            <td>2014-05-14</td>
+            </tr>
+          </tbody>
+          </table>
+        </text>
+        <entry>
+          <!-- Pregnancy Status -->
+          <observation classCode="OBS" moodCode="EVN">
+          <code code="11449-6" displayName="Pregnancy status" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"/>
+          <text/>
+          <statusCode code="completed"/>
+          <!-- e.g. 20140217 -->
+          <effectiveTime value="20150305044455"/>
+          <!-- one of 'value' -->
+          <value xsi:type="CE" code="77386006" displayName="Pregnancy confirmed" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT"/>
+          <!--<value xsi:type="CE" code="102874004" displayName="Unconfirmed pregnancy" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT"/>-->
+          <!--<value xsi:type="CE" code="60001007" displayName="Not pregnant" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT"/>-->
+          <!--<value xsi:type="CE" code="289256000" displayName="Mother delivered" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT"/>-->
+          <!-- Remove entryRelationship if 'Not pregnant' -->
+          <entryRelationship typeCode="SPRT" inversionInd="true">
+            <!-- Delivery Date -->
+            <observation classCode="OBS" moodCode="EVN">
+            <!-- one of 'code' -->
+            <code code="11778-8" displayName="Delivery date Estimated" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"/>
+            <!-- <code code="8665-2" displayName="Last menstrual period start date" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"/> -->
+            <!-- Delivery Date (if 'Mother Delivered') -->
+            <!-- <code code="21112-8" displayName="Birth date" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"/> -->
+            <text/>
+            <statusCode code="completed"/>
+            <!-- e.g. 20141017 -->
+            <value xsi:type="TS" value="20151105"/>
+            </observation>
+          </entryRelationship>
+          </observation>
+        </entry>
+        </section>
+      </component>
+      </structuredBody>
+    </component>
+    </ClinicalDocument>
+    """
+
   it 'should convert mhd v1 metadata to xds.b metadata without error', ->
-    xds = mhd2xds.mhd1Metadata2Xds
+    xds = mhd2xds.mhd1Metadata2XdsForMomconnect
       "documentEntry":
         "patientId": "7612241234567^^^ZAF^NI"
         "uniqueId": "2.15.278071478427527610493133229150878247572"
@@ -23,5 +150,6 @@ describe 'mhs2xds unit tests', ->
         "mimeType": "text/xml"
         "hash": "3664a16caf255c9d481b470a7a1a47c92f92ff5b"
         "size": "4846"
+    , cda
 
     console.log 'XDS metadata that was generated:\n\n' + xds

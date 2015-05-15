@@ -26,13 +26,6 @@ module.exports = (grunt) ->
         dest: './lib/'
         ext: '.js'
 
-    express:
-      custom:
-        options:
-          port: '3100',
-          hostname: '0.0.0.0',
-          server: './lib/index'
-
     coffeelint:
       options:
         configFile: 'coffeelint.json'
@@ -61,6 +54,5 @@ module.exports = (grunt) ->
         tasks: ['build']
 
   grunt.registerTask 'build', ['clean', 'coffee']
-  grunt.registerTask 'serve', ['build', 'express', 'express-keepalive']
   grunt.registerTask 'lint', ['coffeelint']
   grunt.registerTask 'test', ['coffeelint:src', 'build', 'mochacli']

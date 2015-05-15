@@ -19,10 +19,11 @@ exports.Slot = class Slot
     @['@'] =
       'xmlns': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
       'name': name
-    @ValueList = []
+    @ValueList =
+      Value: []
 
     for val in vals
-      @ValueList.push 'Value': val
+      @ValueList.Value.push val
 
   addValue: (val) ->
     @ValueList.push 'Value': val
@@ -209,6 +210,15 @@ exports.DocumentEntry = class DocumentEntry
         uniqueId
       )
 
+  addSlot: (slot) ->
+    @Slot.push slot
+
+  addClassification: (clazz) ->
+    @Classification.push clazz
+
+  addExternalIdentifier: (externId) ->
+    @ExternalIdentifier.push externId
+
   toXml: ->
     return js2xml 'ExtrinsicObject', this
 
@@ -279,6 +289,15 @@ exports.SubmissionSet = class SubmissionSet
         'urn:uuid:96fdda7c-d067-4183-912e-bf5ee74998a8',
         entryUUID,
         uniqueId)
+
+  addSlot: (slot) ->
+    @Slot.push slot
+
+  addClassification: (clazz) ->
+    @Classification.push clazz
+
+  addExternalIdentifier: (externId) ->
+    @ExternalIdentifier.push externId
 
   toXml: ->
     return js2xml 'RegistryPackage', this

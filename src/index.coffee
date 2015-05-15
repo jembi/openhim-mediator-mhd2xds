@@ -4,7 +4,10 @@ app = express()
 
 # require modules
 request = require 'request'
+requestDebug = require 'request-debug'
 Busboy = require 'busboy'
+url = require 'url'
+uuid = require 'uuid'
 mhd2xds = require './mhd2xds'
 
 # get config objects
@@ -15,11 +18,15 @@ mediatorConfig = require "../config/mediator"
 # include register script
 register = require "./register"
 if config.registration.enabled
-  console.log config.registration.enabled
   register.registerMediator apiConfig, mediatorConfig
 
+requestDataMap = {}
+requestDebug request, (type, data, r) ->
+  if type is 'request'
+    requestDataMap[data.headers['mhd-correlation-id']] = data
+
 ##### Default Endpoint  #####
-app.post '/', (req, res) ->
+app.post '*', (req, res) ->
 
   console.log 'Recieved request...'
 
@@ -43,11 +50,18 @@ app.post '/', (req, res) ->
   busboy.on 'finish', ->
     console.log 'Finished parsing attachments...'
 
-    xdsMeta = mhd2xds.mhd1Metadata2Xds metadata
+    cda = (Buffer.concat contentBufs).toString()
+    xdsMeta = mhd2xds.mhd1Metadata2XdsForMomconnect metadata, cda
+
+    requestTime = new Date()
+    correlationId = uuid.v4()
 
     request.post
-      uri: 'http://localhost:6644/'
+      uri: "http://#{config.xdsRepo.host}:#{config.xdsRepo.port}/#{config.xdsRepo.path}"
       method: 'POST'
+      headers:
+        'content-type': 'multipart/related; type="application/xop+xml"; action="urn:ihe:iti:2007:ProvideAndRegisterDocumentSet-b"; start="<metadata@ihe.net>"; start-info="application/soap+xml"'
+        'mhd-correlation-id': correlationId
       multipart: [
         'content-type': 'application/xop+xml; charset=UTF-8; type="application/soap+xml"'
         'content-transfer-encoding': 'binary'
@@ -57,31 +71,41 @@ app.post '/', (req, res) ->
         'content-type': 'text/xml'
         'content-transfer-encoding': 'binary'
         'content-id': "<#{metadata.documentEntry.entryUUID.replace('urn:uuid:', '')}@ihe.net>"
-        body: (Buffer.concat contentBufs).toString('base64')
+        body: cda.toString('base64')
       ]
-    , (err, xdsRes, body) ->
 
+    , (err, xdsRes, body) ->
+      requestData = requestDataMap[correlationId]
+      requestDataMap[correlationId] = null
+      urlParts = url.parse requestData.uri
       # Capture orchestration data
       orchestration =
-        name:             'XDS.b request'
+        name:             'MHD to XDS.b mediator request'
         request:
-          path:           '/'
-          headers:        ''
-          querystring:    ''
-          body:           xdsMeta + '\n===Binary Base64 document data excluded==='
-          method:         'POST'
-          timestamp:      new Date().getTime()
+          path:           urlParts.pathname
+          headers:        requestData.headers
+          querystring:    urlParts.query
+          body:           requestData.body
+          method:         requestData.method
+          timestamp:      requestTime.getTime()
         response:
           status:         xdsRes.statusCode
+          headers:        xdsRes.headers
           body:           body
           timestamp:      new Date().getTime()
 
-      if xdsRes.headers['content-type'] is 'application/json+openhim'
+      if xdsRes.headers['content-type'].indexOf('application/json+openhim') isnt -1
         console.log 'Recieved mediator response...'
-        # alter existing response object
         returnObject = JSON.parse body
+
+        # alter orchestration to match the parse response rather
+        orchestration.response.status = returnObject.response.status
+        orchestration.response.body = returnObject.response.body
+        orchestration.response.headers = returnObject.response.headers
+        
+        # alter existing response object for MHD
         returnObject['x-mediator-urn'] = mediatorConfig.urn
-        returnObject.orchestrations.push orchestration
+        returnObject.orchestrations.unshift orchestration
         returnObject.response.status = if returnObject.status is 'Successful' then 201 else returnObject.response.status
       else
         console.log 'Recieved non-mediator response...'
@@ -109,5 +133,9 @@ app.post '/', (req, res) ->
   # pipe request of to busboy for parsing
   req.pipe busboy
   
-# export app for use in grunt-express module and unit tests
+# export app for use in unit tests
 module.exports = app
+
+if not module.parent
+  app.listen 3100, ->
+    console.log "mhd2xds mediator is up on port 3100..."

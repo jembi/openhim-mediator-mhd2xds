@@ -1,8 +1,25 @@
 js2xml = require 'js2xmlparser'
-uuid = require 'node-uuid'
+uuid = require 'uuid'
+dom = require('xmldom').DOMParser
+xpath = require 'xpath'
 xds = require './xds'
 
-exports.mhd1Metadata2Xds = (metadata) ->
+exports.mhd1Metadata2XdsForMomconnect = (metadata, cda) ->
+  cda = cda.trim()
+  doc = new dom().parseFromString(cda)
+
+  select = xpath.useNamespaces
+    'v3': 'urn:hl7-org:v3'
+
+  birthDate = select 'string(//v3:ClinicalDocument/v3:recordTarget/v3:patientRole/v3:patient/v3:birthTime/@value)', doc
+  birthDate = birthDate.replace '%', ''
+
+  authorId = select 'string(//v3:ClinicalDocument/v3:author/v3:assignedAuthor/v3:id/@extension)', doc
+  if authorId.length is 0 then authorId = 'unknown'
+  authorAssigningAuthorityId = select 'string(//v3:ClinicalDocument/v3:author/v3:assignedAuthor/v3:id/@root)', doc
+
+  gender = select 'string(//v3:ClinicalDocument/v3:recordTarget/v3:patientRole/v3:patient/v3:administrativeGenderCode/@code)', doc
+
   now = new Date() # YYYY[MM[DD[hh[mm[ss]]]]]
   year = now.getUTCFullYear()
   month = now.getUTCMonth() + 1
@@ -22,6 +39,13 @@ exports.mhd1Metadata2Xds = (metadata) ->
     seconds = '0' + seconds
   now = "#{year}#{month}#{day}#{hours}#{minutes}#{seconds}"
 
+  if metadata.documentEntry.patientId.indexOf '&' is -1 and metadata.documentEntry.patientId.indexOf 'ZAF' isnt -1
+    sourceId = metadata.documentEntry.patientId.replace 'ZAF', 'ZAF&0.0.0&ISO'
+  else
+    sourceId = metadata.documentEntry.patientId
+
+  authorPersonSlot = new xds.Slot 'authorPerson', "#{authorId}^^^^^^^^&#{authorAssigningAuthorityId}&ISO"
+
   docEntry = new xds.DocumentEntry(
     metadata.documentEntry.entryUUID,
     metadata.documentEntry.mimeType,
@@ -30,8 +54,8 @@ exports.mhd1Metadata2Xds = (metadata) ->
     metadata.documentEntry.size,
     'en-ZA',
     null, # repositoryUniqueId
-    metadata.documentEntry.patientId # sourcePatientId
-    metadata.documentEntry.patientId,
+    sourceId # sourcePatientId
+    sourceId,
     metadata.documentEntry.uniqueId,
     now, # creationTime
     {
@@ -53,8 +77,16 @@ exports.mhd1Metadata2Xds = (metadata) ->
       scheme: metadata.documentEntry.typeCode.codingScheme,
       name: metadata.documentEntry.typeCode.codeName
     },
-    [] # authorSlots
+    [authorPersonSlot] # authorSlots
   )
+
+  # sourcePatientId slot
+  slot = new xds.Slot 'sourcePatientInfo',
+    "PID-3|#{sourceId}",
+    'PID-5|Unknown^Unknown^^^',
+    "PID-7|#{birthDate}"
+    "PID-8|#{gender}"
+  docEntry.addSlot slot
 
   submissionSet = new xds.SubmissionSet(
     uuid.v4(), # entryUUID
@@ -64,7 +96,7 @@ exports.mhd1Metadata2Xds = (metadata) ->
     null, # sourceId
     uuid.v4(),
     null, # contentType
-    [] # authorSlots
+    [authorPersonSlot] # authorSlots
   )
 
   pnrReq = new xds.ProvideAndRegisterDocumentSetRequest [docEntry], submissionSet

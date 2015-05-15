@@ -6,7 +6,7 @@ Content-Type: application/json
 {
   "documentEntry": {
     "patientId": "7612241234567^^^ZAF^NI",
-    "uniqueId": "2.15.278071478427527610493133229150878247572",
+    "uniqueId": "2.15.278071578427527610493133229150878247574",
     "entryUUID": "urn:uuid:d1329e63-0408-4f45-b5ba-35f9afa72a94",
     "classCode": { "code": "51855-5", "codingScheme": "2.16.840.1.113883.6.1", "codeName": "Patient Note" },
     "typeCode": { "code": "51855-5", "codingScheme": "2.16.840.1.113883.6.1", "codeName": "Patient Note" },
@@ -59,7 +59,7 @@ Content-Type: text/xml
 <author>
   <time value="20150305044455"/>
   <assignedAuthor>
-	<id extension="1234" root="833f2856-b9e1-4f54-8694-c74c4283755f" assigningAuthorityName="HCW Code"/>
+	<id root="833f2856-b9e1-4f54-8694-c74c4283755f" assigningAuthorityName="HCW Code"/>
 	<addr/>
 	<telecom value="tel:+27744444567"/>
 	<assignedPerson>

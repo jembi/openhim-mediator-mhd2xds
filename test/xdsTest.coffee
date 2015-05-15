@@ -102,11 +102,13 @@ describe 'XDS class Tests', ->
         'rim': 'urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0'
 
       count = select 'count(//rim:Slot/rim:ValueList/rim:Value)', doc
+      count2 = select 'count(//rim:Slot/rim:ValueList)', doc
       val1 = select 'string(//rim:Slot/rim:ValueList/rim:Value[1])', doc
       val2 = select 'string(//rim:Slot/rim:ValueList/rim:Value[2])', doc
       val3 = select 'string(//rim:Slot/rim:ValueList/rim:Value[3])', doc
 
       count.should.be.exactly 3
+      count2.should.be.exactly 1
       val1.should.be.exactly 'val1'
       val2.should.be.exactly 'val2'
       val3.should.be.exactly 'val3'
