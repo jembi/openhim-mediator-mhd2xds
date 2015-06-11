@@ -47,7 +47,7 @@ Content-Type: text/xml
 	  </name>
 	  <administrativeGenderCode code="F" codeSystem="2.16.840.1.113883.5.1"/>
 	  <!-- e.g. 19700123 -->
-	  <birthTime value="19920305%"/>
+	  <birthTime value="19920305"/>
 	  <languageCommunication>
 		<languageCode code="eng"/>
 		<preferenceInd value="true"/>

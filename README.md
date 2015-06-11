@@ -6,3 +6,11 @@ This is a mediator for the [OpenHIM](http://www.openhim.org) tool that converts 
 To run, clone the repo and run `npm start`
 
 To install as a binary, clone the repo and run `npm install -g .` then run the binary `mhd2xds`.
+
+## Send a test message
+
+From the test/ directory execute the following (just replace the auth and host details):
+
+```
+curl -X POST -H "Content-Type: multipart/form-data; boundary=48940923NODERESLTER3890457293" -H "Expect:" -H "Authorization: Basic <base64_auth>" --data-binary @generated-mhd.txt -v http://<host>:5001/mhd/
+```
